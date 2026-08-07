@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background-color: #0b0f19;
+            overflow: hidden;
+        }
+
+        /* --- CONTENEDOR DIVIDIDO (SPLIT LAYOUT) --- */
+        .login-container {
+            display: table;
+            width: 100%;
+            height: 100vh;
+            table-layout: fixed;
+        }
+
+        .brand-side, .form-side {
+            display: table-cell;
+            vertical-align: middle;
+            height: 100vh;
+        }
+
+        /* Sección Izquierda: Identidad de Marca y Carrusel */
+        .brand-side {
+            width: 58%;
+            position: relative;
+            /* Llamada a tu endpoint de FastAPI */
+            background: linear-gradient(135deg, #0b0f19 0%, #14213d 100%);
+            padding: 60px;
+        }
+
+        /* Overlay decorativo de color azul corporativo sutil */
+        .brand-side::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(14, 116, 144, 0.08) 0%, rgba(11, 15, 25, 0.15) 100%);
+            z-index: 1;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-logo-area {
+            text-align: center;
+        }
+        .brand-logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
+        .brand-logo-main {
+            height: 84px;
+            width: auto;
+            display: block;
+        }
+        .brand-logo-tag {
+            color: #e0533c; /* Unificado a Terracota Otoñal */
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .brand-logo-area p {
+            color: #cbd5e1;
+            font-size: 1.15rem;
+            margin-top: 16px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        /* --- NUEVO CARRUSEL DINÁMICO --- */
+        .carousel-container {
+            margin-top: auto;
+            margin-bottom: 12%;
+            max-width: 500px;
+        }
+        .carousel-slide {
+            display: none;
+            animation: fadeEffect 0.8s ease-in-out;
+        }
+        .carousel-slide.active {
+            display: block;
+        }
+        .carousel-slide i {
+            font-size: 2.5rem;
+            color: #e0533c; /* Unificado a Terracota Otoñal */
+            display: block;
+            margin-bottom: 15px;
+        }
+        .carousel-slide h2 {
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+        .carousel-slide p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+        
+        @keyframes fadeEffect {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sección Derecha: Formulario Limpio Premium */
+        .form-side {
+            width: 42%;
+            background: #0f172a; /* Slate 900 de tu paleta premium */
+            padding: 60px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+        }
+
+        .form-wrapper {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            margin-bottom: 35px;
+            text-align: center;
+        }
+        .form-header .form-logo {
+            height: 84px;
+            width: auto;
+            margin: 0 auto 22px;
+            display: block;
+        }
+        .form-header h2 {
+            color: #ffffff;
+            font-size: 2.1rem;
+            font-weight: 700;
+        }
+        .form-header p {
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-top: 5px;
+        }
+
+        /* Inputs Modernos Estilizados */
+        .input-group {
+            position: relative;
+            margin-bottom: 22px;
+        }
+        .input-group i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #475569;
+            font-size: 1.15rem;
+            transition: color 0.3s;
+            z-index: 10;
+        }
+        .input-group input {
+            width: 100%;
+            height: 50px; /* Altura simétrica corregida */
+            padding: 0 14px 0 44px; /* Centrado vertical perfecto */
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+            border-color: #e0533c; /* Borde enfocado en terracota */
+            background: #1e293b;
+            box-shadow: 0 0 0 4px rgba(224, 83, 60, 0.15);
+        }
+        .input-group input:focus + i, 
+        .input-group:focus-within i {
+            color: #e0533c !important; /* Ícono enfocado en terracota */
+        }
+
+        /* Botón de envío */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #e0533c; /* Tu terracota premium corporativo */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background: #c2412c; /* accent-hover */
+            box-shadow: 0 4px 12px rgba(224, 83, 60, 0.2);
+        }
+        .btn-submit:disabled {
+            background: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Mensajes de error y cargador */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loader-container {
+            display: none;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #e0533c; /* Spinner unificado a terracota */
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer de derechos */
+        .login-footer {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .login-footer p {
+            color: #475569;
+            font-size: 0.8rem;
+        }
+
+        /* Adaptabilidad móvil */
+        @media (max-width: 992px) {
+            .brand-side { display: none; }
+            .form-side { width: 100%; padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        
+        <div class="brand-side">
+            <div class="brand-content">
+                
+                <div class="brand-logo-area">
+                    <div class="brand-logo-row">
+                        <img src="/images/logo-blanco.svg" alt="SGI" class="brand-logo-main">
+                    </div>
+                    <p>Sistema de Gestión e Inventario</p>
+                </div>
+
+                <div class="carousel-container">
+                    
+                    <div class="carousel-slide active">
+                        <h2>Módulo de Distribución</h2>
+                        <p>Control automatizado y centralizado de indumentaria para el Staff corporativo y de complejos a nivel nacional.</p>
+                    </div>
+
+                    <div class="carousel-slide">
+                        <i class="bi bi-boxes"></i>
+                        <h2>Inventario en Tiempo Real</h2>
+                        <p>Supervisión exacta de existencias en estantería por sede, alertas automáticas de stock mínimo y quiebres de material.</p>
+                    </div>
+
+                    <div class="carousel-slide">
+                        <i class="bi bi-person-check"></i>
+                        <h2>Asignación y Dotaciones</h2>
+                        <p>Registro transparente de entregas directas a colaboradores vinculadas a sus fichas operativas y tallas de perfil.</p>
+                    </div>
+
+                    <div class="carousel-slide">
+                        <i class="bi bi-shield-check"></i>
+                        <h2>Auditoría y Transacciones</h2>
+                        <p>Flujo seguro para la validación de mermas, stock out y solicitudes de anulación con aprobación centralizada.</p>
+                    </div>
+
+                </div>
+
+                <div></div> 
+            </div>
+        </div>
+
+        <div class="form-side">
+            <div class="form-wrapper">
+                
+                <div class="form-header">
+                    <img src="/images/icono.svg" alt="SGI" class="form-logo">
+                    <h2>Bienvenido al Sistema</h2>
+                    <p>Por favor, introduce tus credenciales corporativas.</p>
+                </div>
+
+                <div class="loader-container" id="loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <div class="error-message" id="errorMsg">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span></span>
+                </div>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input type="email" id="email" placeholder="Correo electrónico corporativo" required autocomplete="email">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="password" placeholder="Contraseña de seguridad" required>
+                        <i class="bi bi-lock"></i>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSubmit">Acceder al Sistema</button>
+                </form>
+
+                <div class="login-footer">
+                    <p>&copy; 2026 SGI. Todos los derechos reservados.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- JAVASCRIPT DEL CARRUSEL AUTOMÁTICO ---
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            currentSlideIndex = index;
+        }
+
+        function nextSlide() {
+            let next = (currentSlideIndex + 1) % slides.length;
+            showSlide(next);
+        }
+
+        // Cambio automático cada 5 segundos
+        let carouselTimer = setInterval(nextSlide, 5000);
+
+
+        // --- LÓGICA DE LOGIN ORIGINAL INTACTA ---
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const loader = document.getElementById('loader');
+
+            // Limpiar estados previos
+            errorMsg.style.display = 'none';
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'Validando credenciales...';
+            loader.style.display = 'flex';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Vinculación completa con LocalStorage
+                    localStorage.setItem('rol', result.rol);
+                    localStorage.setItem('id_suc', result.id_suc);
+                    localStorage.setItem('id_usuario', result.id_usuario);
+                    localStorage.setItem('nombre_suc', result.nombre_suc);
+                    localStorage.setItem('access_token', result.access_token);
+                    localStorage.setItem('refresh_token', result.refresh_token);
+
+                    btnSubmit.innerText = 'Redireccionando...';
+
+                    if (result.rol === 'admin') {
+                        window.location.href = '/superadmin';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                } else {
+                    errorMsg.querySelector('span').innerText = result.detail || 'Ocurrió un error inesperado.';
+                    errorMsg.style.display = 'flex';
+                    resetButton();
+                }
+            } catch (err) {
+                errorMsg.querySelector('span').innerText = 'Error de red: No se pudo conectar al servidor.';
+                errorMsg.style.display = 'flex';
+                resetButton();
+            }
+        });
+
+        function resetButton() {
+            document.getElementById('loader').style.display = 'none';
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = false;
+            btn.innerText = 'Acceder al Sistema';
+        }
+    </script>
+</body>
+</html>

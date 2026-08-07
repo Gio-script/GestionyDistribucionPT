@@ -1,0 +1,3501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGI - Panel Local de Sede</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    /* ========================================== */
+    /* PALETA OFICIAL CINÉPOLIS                  */
+    /* ========================================== */
+    :root {
+        /* Colores Corporativos Cinépolis */
+        --cine-blue: #0D3B82;
+        --cine-blue-light: #1D4ED8;
+        --cine-blue-soft: #E8F0FE;
+        --cine-blue-dark: #072352;
+        --cine-gold: #FFC700;
+        --cine-gold-soft: #FFF8E0;
+        --cine-red: #F64E4E;
+        --cine-red-soft: #FFE8E8;
+        --cine-white: #FFFFFF;
+        --cine-gray: #E8E8E8;
+        --cine-gray-dark: #D3D3D3;
+        --cine-black: #1A1A1A;
+        --cine-text: #1A1A1A;
+        --cine-text-light: #4A4A4A;
+        --cine-text-muted: #8A8A8A;
+        
+        /* Variables del sistema */
+        --bg-app: #F5F7FA;
+        --bg-sidebar: #FFFFFF;
+        --bg-card: #FFFFFF;
+        --bg-input: #FFFFFF;
+        --border: #E8E8E8;
+        --border-soft: #F0F0F0;
+        --border-glow: rgba(13, 59, 130, 0.2);
+        --accent: #0D3B82;
+        --accent-hover: #1D4ED8;
+        --accent-soft: #E8F0FE;
+        --text-primary: #1A1A1A;
+        --text-secondary: #4A4A4A;
+        --text-muted: #8A8A8A;
+        --success: #0D3B82;
+        --success-soft: #E8F0FE;
+        --danger: #F64E4E;
+        --danger-soft: #FFE8E8;
+        --warning: #FFC700;
+        --warning-soft: #FFF8E0;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+        --transition-speed: 0.15s;
+    }
+
+    body[data-theme="dark"] {
+        --bg-app: #0D1117;
+        --bg-sidebar: #161B22;
+        --bg-card: #1C2333;
+        --bg-input: #0D1117;
+        --border: #30363D;
+        --border-soft: #21262D;
+        --border-glow: rgba(13, 59, 130, 0.3);
+        --accent: #2D6EB0;
+        --accent-hover: #4A8BD4;
+        --accent-soft: #1C2D4A;
+        --text-primary: #F0F6FC;
+        --text-secondary: #C9D1D9;
+        --text-muted: #8B949E;
+        --success: #2D6EB0;
+        --success-soft: #1C2D4A;
+        --danger: #F64E4E;
+        --danger-soft: #3A1518;
+        --warning: #D4A800;
+        --warning-soft: #2D2600;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    
+    body { 
+        background-color: var(--bg-app); 
+        color: var(--text-primary); 
+        min-height: 100vh; 
+        display: flex; 
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+
+    /* ========================================== */
+    /* SIDEBAR                                    */
+    /* ========================================== */
+    .sidebar {
+        width: 260px; 
+        background-color: var(--bg-sidebar); 
+        border-right: 1px solid var(--border);
+        display: flex; 
+        flex-direction: column; 
+        padding: 20px 14px; 
+        flex-shrink: 0;
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .brand { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        padding-bottom: 20px; 
+        border-bottom: 1px solid var(--border-soft);
+        transition: border-color var(--transition-speed) ease;
+    }
+    .brand-logo {
+        height: 30px;
+        width: auto;
+        display: block;
+    }
+    .brand-logo-dark { display: none; }
+    body[data-theme="dark"] .brand-logo-light { display: none; }
+    body[data-theme="dark"] .brand-logo-dark { display: block; }
+    .brand h2 { 
+        font-size: 1.1rem; 
+        font-weight: 700; 
+        color: var(--text-primary);
+        transition: color var(--transition-speed) ease;
+    }
+    .brand h2 span { 
+        color: var(--cine-gold);
+    }
+    .brand small {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        font-weight: 400;
+        display: block;
+        margin-top: -2px;
+    }
+
+    .nav-menu {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex-grow: 1;
+    }
+    .nav-badge {
+        background-color: var(--danger); color: #ffffff; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 20px; min-width: 24px; text-align: center;
+        box-shadow: 0 2px 5px rgba(246, 78, 78, 0.4); animation: pulse-badge 2s infinite;
+    }
+    @keyframes pulse-badge {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(246, 78, 78, 0.7); }
+        70% { transform: scale(1.03); box-shadow: 0 0 0 5px rgba(246, 78, 78, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(246, 78, 78, 0); }
+    }
+    .menu-section-title { 
+        font-size: 0.7rem; 
+        font-weight: 700; 
+        color: var(--text-muted); 
+        letter-spacing: 0.8px; 
+        margin: 12px 0 4px 12px; 
+        text-transform: uppercase;
+        transition: color var(--transition-speed) ease;
+    }
+    
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, transform 0.1s ease;
+    }
+    .nav-item:hover { 
+        background-color: var(--accent-soft); 
+        color: var(--accent); 
+        transform: translateX(2px);
+    }
+    .nav-item.active { 
+        background-color: var(--accent-soft); 
+        color: var(--accent); 
+    }
+    .nav-item i { 
+        font-size: 1.1rem; 
+        width: 22px; 
+        text-align: center;
+    }
+    
+    /* ========================================== */
+    /* MAIN CONTAINER                             */
+    /* ========================================== */
+    .main-container { 
+        flex-grow: 1; 
+        padding: 24px 28px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 20px; 
+        overflow-y: auto; 
+        max-height: 100vh;
+        transition: background-color var(--transition-speed) ease;
+    }
+    .header-actions { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .branch-badge-top {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border);
+        padding: 8px 16px;
+        border-radius: 12px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: var(--card-shadow);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+    .branch-badge-top i { 
+        color: var(--accent); 
+        font-size: 1rem;
+        transition: color var(--transition-speed) ease;
+    }
+
+    .view-panel { display: none; }
+    .view-panel.active { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 20px; 
+        animation: fadeIn 0.2s ease; 
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========================================== */
+    /* CARDS                                      */
+    /* ========================================== */
+    .card { 
+        background-color: var(--bg-card); 
+        border: 1px solid var(--border); 
+        border-radius: 16px;
+        padding: 20px 24px; 
+        box-shadow: var(--card-shadow); 
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.1s ease;
+    }
+    .card:hover {
+        border-color: var(--border-glow);
+        transform: translateY(-1px);
+    }
+    
+    .card-title { 
+        font-size: 1rem; 
+        font-weight: 700; 
+        margin-bottom: 4px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        flex-wrap: wrap; 
+        gap: 8px;
+        color: var(--text-primary);
+        transition: color var(--transition-speed) ease;
+    }
+    .card-subtitle { 
+        font-size: 0.78rem; 
+        color: var(--text-muted); 
+        margin-bottom: 16px;
+        transition: color var(--transition-speed) ease;
+    }
+
+    /* ========================================== */
+    /* KPI CARDS                                  */
+    /* ========================================== */
+    .kpi-container { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+        gap: 12px; 
+    }
+    @media (min-width: 1200px) {
+        .kpi-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    .kpi-card { 
+        display: flex; 
+        flex-direction: row; 
+        align-items: center; 
+        gap: 14px; 
+        padding: 18px 20px; 
+        border-left: 4px solid var(--accent);
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .kpi-card:hover {
+        border-color: var(--cine-gold);
+    }
+    .kpi-icon { 
+        background: var(--accent-soft); 
+        color: var(--accent); 
+        font-size: 1.6rem; 
+        width: 48px; 
+        height: 48px; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        border-radius: 10px; 
+        flex-shrink: 0;
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+    .kpi-icon i {
+        font-size: 1.4rem;
+    }
+    .kpi-data h3 { 
+        font-size: 1.6rem; 
+        font-weight: 800; 
+        color: var(--text-primary); 
+        margin-bottom: 0px; 
+        line-height: 1.1;
+        transition: color var(--transition-speed) ease;
+    }
+    .kpi-data p { 
+        font-size: 0.7rem; 
+        color: var(--text-muted); 
+        font-weight: 600; 
+        text-transform: uppercase; 
+        letter-spacing: 0.3px; 
+        margin-bottom: 1px;
+        transition: color var(--transition-speed) ease;
+    }
+    .kpi-data small { 
+        font-size: 0.65rem; 
+        color: var(--text-muted);
+        transition: color var(--transition-speed) ease;
+    }
+
+    /* ========================================== */
+    /* ROTACIÓN CARDS                            */
+    /* ========================================== */
+    .rotacion-item {
+        padding: 8px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    .rotacion-item small {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    /* ========================================== */
+    /* FORMS                                      */
+    /* ========================================== */
+    .form-row { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); 
+        gap: 16px; 
+        align-items: end; 
+    }
+    .input-box { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 4px; 
+        text-align: left; 
+    }
+    .input-box label { 
+        font-size: 0.75rem; 
+        font-weight: 600; 
+        color: var(--text-secondary);
+        transition: color var(--transition-speed) ease;
+    }
+    
+    .input-box input, .input-box select, .input-box textarea {
+        width: 100%; 
+        padding: 10px 14px; 
+        background-color: var(--bg-input); 
+        border: 1px solid var(--border);
+        border-radius: 10px; 
+        color: var(--text-primary); 
+        outline: none; 
+        font-size: 0.9rem;
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow 0.12s ease;
+    }
+
+    .input-box input:focus, .input-box select:focus, .input-box textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(13, 59, 130, 0.12);
+    }
+    
+    /* ========================================== */
+    /* BUTTONS                                    */
+    /* ========================================== */
+    .btn-action { 
+        padding: 10px 18px; 
+        background-color: var(--accent); 
+        color: #fff; 
+        border: none; 
+        border-radius: 10px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        height: 42px; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 6px;
+        font-size: 0.85rem;
+        transition: background-color var(--transition-speed) ease, transform 0.1s ease, box-shadow 0.15s ease;
+        box-shadow: 0 2px 8px rgba(13, 59, 130, 0.2);
+    }
+
+    .btn-action:hover { 
+        background-color: var(--accent-hover); 
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 59, 130, 0.3);
+    }
+
+    .btn-action:active {
+        transform: scale(0.97);
+    }
+    
+    .btn-csv { 
+        background-color: var(--cine-blue-light); 
+        color: #fff; 
+        padding: 6px 12px; 
+        font-size: 0.75rem; 
+        height: auto; 
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2);
+    }
+    .btn-csv:hover {
+        background-color: #2563EB;
+    }
+    .btn-danger-custom { 
+        background-color: var(--danger); 
+        box-shadow: 0 2px 8px rgba(246, 78, 78, 0.25);
+    }
+    .btn-danger-custom:hover {
+        background-color: #DC2626;
+    }
+    .btn-gold { 
+        background-color: var(--cine-gold); 
+        color: var(--cine-black); 
+        box-shadow: 0 2px 8px rgba(255, 199, 0, 0.3);
+    }
+    .btn-gold:hover {
+        background-color: #E6B300;
+    }
+    .btn-success-custom {
+        background-color: #22C55E;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+    }
+    .btn-success-custom:hover {
+        background-color: #16A34A;
+    }
+
+    /* ========================================== */
+    /* TABLES                                     */
+    /* ========================================== */
+    .table-responsive { 
+        overflow-x: auto; 
+        margin-top: 12px; 
+    }
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        text-align: left; 
+        font-size: 0.85rem; 
+    }
+    
+    tbody tr {
+        transition: background-color 0.1s ease, transform 0.1s ease;
+    }
+    tbody tr:hover {
+        background-color: var(--accent-soft);
+        transform: translateX(2px);
+    }
+
+    th { 
+        color: var(--text-muted); 
+        font-weight: 700; 
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.7rem;
+        padding: 10px 12px; 
+        border-bottom: 2px solid var(--border);
+        transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    td { 
+        padding: 10px 12px; 
+        border-bottom: 1px solid var(--border-soft); 
+        color: var(--text-secondary);
+        transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    /* ========================================== */
+    /* BADGES                                     */
+    /* ========================================== */
+    .badge { 
+        display: inline-block; 
+        padding: 3px 8px; 
+        border-radius: 5px; 
+        font-size: 0.7rem; 
+        font-weight: 700; 
+    }
+    .badge.success { background-color: var(--success-soft); color: var(--success); }
+    .badge.active { background-color: var(--accent-soft); color: var(--accent); }
+    .badge.pending { background-color: var(--warning-soft); color: #B8860B; }
+    .badge.inactive { background-color: var(--danger-soft); color: var(--danger); }
+    .badge.info { background-color: var(--accent-soft); color: var(--accent); }
+    .badge.warning { background-color: var(--warning-soft); color: #B8860B; }
+
+    /* ========================================== */
+    /* CHECKBOXES                                 */
+    /* ========================================== */
+    input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--accent);
+    }
+
+    /* ========================================== */
+    /* PAGINACIÓN                                 */
+    /* ========================================== */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-soft);
+        flex-wrap: wrap;
+        gap: 8px;
+        transition: border-color var(--transition-speed) ease;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        transition: color var(--transition-speed) ease;
+    }
+    .pagination-info strong {
+        color: var(--text-primary);
+        transition: color var(--transition-speed) ease;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg-input);
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .pagination button.active {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+
+    .pagination button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .pagination button.ellipsis {
+        border: none;
+        background: transparent;
+        cursor: default;
+        pointer-events: none;
+    }
+    .pagination button.ellipsis:hover {
+        background: transparent;
+    }
+
+    /* ========================================== */
+    /* STOCK SPLIT                                */
+    /* ========================================== */
+    .stock-split { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 992px) { .stock-split { grid-template-columns: 1.4fr 1fr; } }
+    .chart-container { width: 100%; max-width: 300px; position: relative; margin: auto; }
+
+    /* ========================================== */
+    /* DOTACIÓN DETALLE                           */
+    /* ========================================== */
+    .colab-row { cursor: pointer; }
+    .detail-row { display: none; background-color: var(--bg-input); }
+    .detail-row.open { display: table-row; animation: fadeIn 0.2s ease; }
+    .cortina-content { 
+        padding: 12px 16px; 
+        border-left: 4px solid var(--accent); 
+        border-bottom: 1px solid var(--border);
+        transition: border-color var(--transition-speed) ease;
+    }
+    .detail-table { 
+        width: 100%; 
+        background: var(--bg-card); 
+        border: 1px solid var(--border); 
+        border-radius: 8px; 
+        overflow: hidden;
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .detail-table th { background-color: var(--bg-sidebar); padding: 6px 12px; font-size: 0.75rem; }
+    .detail-table td { padding: 6px 12px; border-bottom: 1px solid var(--border-soft); font-size: 0.8rem; }
+
+    /* ========================================== */
+    /* MODALS                                     */
+    /* ========================================== */
+    .modal-overlay { 
+        position: fixed; 
+        top:0; left:0; 
+        width:100%; height:100%; 
+        background: rgba(0,0,0,0.5); 
+        display: none; 
+        justify-content: center; 
+        align-items: center; 
+        z-index: 200; 
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.2s ease;
+    }
+    .modal-content { 
+        background: var(--bg-card); 
+        border: 1px solid var(--border); 
+        padding: 24px; 
+        border-radius: 16px; 
+        width: 100%; 
+        max-width: 640px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 16px; 
+        box-shadow: var(--card-shadow);
+        transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ========================================== */
+    /* INLINE ACTIONS                             */
+    /* ========================================== */
+    .actions-cell { display: flex; gap: 6px; justify-content: center; }
+    .btn-edit-inline { 
+        background: var(--accent-soft); 
+        color: var(--accent); 
+        border: none; 
+        padding: 4px 10px; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-size: 0.8rem;
+        transition: background-color 0.1s ease, color 0.1s ease;
+    }
+    .btn-edit-inline:hover { 
+        background: var(--accent); 
+        color: #fff; 
+    }
+    .btn-delete-inline { 
+        background: var(--danger-soft); 
+        color: var(--danger); 
+        border: none; 
+        padding: 4px 10px; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-size: 0.8rem;
+        transition: background-color 0.1s ease, color 0.1s ease;
+    }
+    .btn-delete-inline:hover { 
+        background: var(--danger); 
+        color: #fff; 
+    }
+
+    /* ========================================== */
+    /* VISOR DE TALLAS                            */
+    /* ========================================== */
+    .visor-tallas { 
+        padding: 8px 14px; 
+        background: var(--accent-soft); 
+        border-radius: 8px; 
+        color: var(--accent); 
+        font-weight: 600; 
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        border: 1px solid var(--border);
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    /* ========================================== */
+    /* TOASTS                                     */
+    /* ========================================== */
+    .toast-container {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .toast {
+        padding: 12px 20px;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        animation: slideIn 0.2s ease;
+        min-width: 240px;
+        display: flex;
+        align-items: center;
+    }
+    .toast.success { background: var(--accent); }
+    .toast.error { background: var(--danger); }
+    .toast.warning { background: #D4A800; color: #1A1A1A; }
+    .toast.info { background: var(--cine-blue-light); }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ========================================== */
+    /* TEXT CENTER                                */
+    /* ========================================== */
+    .text-center { text-align: center; }
+    .text-muted { color: var(--text-muted); }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="sidebar">
+        <div class="brand">
+            <img src="/images/logo-azul.svg" alt="SGI" class="brand-logo brand-logo-light">
+            <img src="/images/logo-blanco.svg" alt="SGI" class="brand-logo brand-logo-dark">
+            <div class="brand-text">
+                <h2><span>SGI</span></h2>
+                <small>Módulo de Distribución</small>
+            </div>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchView('home', this)"><i class="bi bi-house-door"></i> Resumen Ejecutivo</div>
+
+            <p class="menu-section-title">Inventario Bodega</p>
+            <div class="nav-item" onclick="switchView('facturas', this)"><i class="bi bi-box-seam"></i> Ingreso de Facturas</div>
+            <div class="nav-item" onclick="switchView('stock', this)"><i class="bi bi-pie-chart"></i> Stock Local y Mermas</div>
+
+            <p class="menu-section-title">Gestión de Personal</p>
+            <div class="nav-item" onclick="switchView('colaboradores', this)"><i class="bi bi-people"></i> Ingreso y edición de personal</div>
+            <div class="nav-item" onclick="switchView('entregas', this)"><i class="bi bi-person-workspace"></i> Asignar Indumentaria</div>
+            
+            <p class="menu-section-title">Auditoría Central</p>
+            <div class="nav-item" onclick="switchView('solicitudes', this)"><i class="bi bi-file-earmark-break"></i> Anulaciones</div>
+
+            <p class="menu-section-title">Logística Inter-Sede</p>
+            <div class="nav-item" onclick="switchView('traslados', this)"><i class="bi bi-arrow-left-right"></i> Transferencias</div>
+            <div class="nav-item" onclick="switchView('recepcion', this)" style="justify-content: space-between;">
+                <div style="display: flex; gap: 12px; align-items: center;"><i class="bi bi-box-arrow-in-down"></i> Recepción de Transferencias</div>
+                <span id="badge-recepcion" class="nav-badge" style="display: none;">0</span>
+            </div>
+
+            <p class="menu-section-title">Opciones</p>
+            <div class="nav-item" id="themeToggle">
+                <i class="bi bi-sun" id="themeIcon"></i> <span id="themeText">Modo Claro</span>
+            </div>
+            <div class="nav-item" style="color: var(--danger);" onclick="localStorage.clear(); window.location.href='/'">
+                <i class="bi bi-door-open"></i> Cerrar Sesión
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="header-actions">
+            <div>
+                <h1 id="viewTitle" style="font-size: 1.3rem; font-weight: 700; transition: color var(--transition-speed) ease;">📊 Resumen Ejecutivo</h1>
+                <p id="viewSubtitle" style="color: var(--text-muted); font-size: 0.8rem; transition: color var(--transition-speed) ease;">Vista general de operaciones, métricas y alertas críticas de la sede.</p>
+            </div>
+            <div class="branch-badge-top">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span id="lblBranchSessionInfo">Cargando Sede...</span>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: HOME                           -->
+        <!-- ===================================== -->
+        <div id="view-home" class="view-panel active">
+            <!-- KPI Cards - Primera fila -->
+            <div class="kpi-container">
+                <div class="card kpi-card">
+                    <div class="kpi-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-stock">0</h3>
+                        <p>Stock Disponible</p>
+                        <small>Unidades en bodega</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: var(--success);">
+                    <div class="kpi-icon" style="background:var(--success-soft); color:var(--success);"><i class="bi bi-person-check"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-dotacion">0</h3>
+                        <p>Dotación en Uso</p>
+                        <small>Prendas asignadas al personal</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: var(--accent);">
+                    <div class="kpi-icon" style="background:var(--accent-soft); color:var(--accent);"><i class="bi bi-people"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-colaboradores">0</h3>
+                        <p>Colaboradores Activos</p>
+                        <small>Personal registrado en sede</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: var(--warning);">
+                    <div class="kpi-icon" style="background:var(--warning-soft); color:#B8860B;"><i class="bi bi-person-badge"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-colab-dotados">0</h3>
+                        <p>Con Dotación Asignada</p>
+                        <small>Colaboradores con uniforme</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards - Segunda fila (Valores monetarios) -->
+            <div class="kpi-container">
+                <div class="card kpi-card" style="border-left-color: #22C55E;">
+                    <div class="kpi-icon" style="background:#DCFCE7; color:#22C55E;"><i class="bi bi-cash-stack"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-valor-stock">$0</h3>
+                        <p>Valor en Bodega</p>
+                        <small>Stock disponible valuado</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: #F59E0B;">
+                    <div class="kpi-icon" style="background:#FEF3C7; color:#F59E0B;"><i class="bi bi-person-workspace"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-valor-dotacion">$0</h3>
+                        <p>Valor en Dotación</p>
+                        <small>Indumentaria en uso</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: #EF4444;">
+                    <div class="kpi-icon" style="background:#FEE2E2; color:#EF4444;"><i class="bi bi-trash3"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-valor-mermas">$0</h3>
+                        <p>Valor en Mermas</p>
+                        <small>Pérdidas registradas</small>
+                    </div>
+                </div>
+                <div class="card kpi-card" style="border-left-color: #8B5CF6;">
+                    <div class="kpi-icon" style="background:#EDE9FE; color:#8B5CF6;"><i class="bi bi-arrow-repeat"></i></div>
+                    <div class="kpi-data">
+                        <h3 id="kpi-total-activo">$0</h3>
+                        <p>Activo Total</p>
+                        <small>Bodega + Dotación</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rotación de productos -->
+            <div class="stock-split" style="margin-top:4px;">
+                <div class="card" style="border-left: 4px solid var(--success);">
+                    <p class="card-title" style="color:var(--success);"><i class="bi bi-arrow-up-circle"></i> Mayor Rotación</p>
+                    <p class="card-subtitle">Producto más entregado en la sede</p>
+                    <div id="productoMayorRotacion" class="rotacion-item">Cargando...</div>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--danger);">
+                    <p class="card-title" style="color:var(--danger);"><i class="bi bi-arrow-down-circle"></i> Menor Rotación</p>
+                    <p class="card-subtitle">Producto menos entregado / estancado</p>
+                    <div id="productoMenorRotacion" class="rotacion-item">Cargando...</div>
+                </div>
+            </div>
+
+            <!-- Alertas de quiebre de stock -->
+            <div class="card" style="border-top: 4px solid var(--danger);">
+                <p class="card-title" style="color:var(--danger)"><i class="bi bi-exclamation-octagon"></i> Alertas de Quiebre de Stock</p>
+                <p class="card-subtitle">Atención: Los siguientes productos cuentan con 3 unidades o menos en la bodega física.</p>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>ID Producto</th><th>Nombre y Descripción</th><th>Talla</th><th>Stock Físico Actual</th></tr></thead>
+                        <tbody id="alertaStockBody"><tr><td colspan="4" style="text-align:center; color:var(--text-muted)">Cargando métricas...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: FACTURAS                       -->
+        <!-- ===================================== -->
+        <div id="view-facturas" class="view-panel">
+            <div class="card">
+                <p class="card-title">Datos de Cabecera</p>
+                <div class="form-row" style="margin-bottom: 16px;">
+                    <div class="input-box"><label>N° Correlativo</label><input type="number" id="fac_correlativo" placeholder="Ej: 4512"></div>
+                    <div class="input-box"><label>RUT Proveedor</label><input type="text" id="fac_rut_prov" placeholder="12.345.678-9"></div>
+                    <div class="input-box"><label>Nombre Proveedor</label><input type="text" id="fac_nom_prov" placeholder="Ej: Distribuidora Central"></div>
+                </div>
+                <p class="card-title">Añadir Ítems de la Factura</p>
+                <div class="form-row">
+                    <div class="input-box">
+                        <label>Buscar y Seleccionar Prenda</label>
+                        <input type="text" id="fac_combo_producto_input" list="fac_productos_list" placeholder="Escribe para buscar prenda...">
+                        <datalist id="fac_productos_list"></datalist>
+                    </div>
+                    <div class="input-box"><label>Cantidad</label><input type="number" id="fac_cantidad" placeholder="Cantidad"></div>
+                    <button class="btn-action" onclick="agregarFilaFactura()"><i class="bi bi-plus-lg"></i> Añadir Fila</button>
+                </div>
+                <div class="table-responsive">
+                    <table><thead><tr><th>ID</th><th>Descripción</th><th>Talla</th><th>Cantidad</th></tr></thead><tbody id="facturaItemsBody"></tbody></table>
+                </div>
+                <button class="btn-action" style="width:100%; margin-top:20px;" onclick="confirmarFacturaCompleta()">💾 Confirmar e Ingresar Factura al Stock</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>📜 Historial de Facturas Ingresadas</span>
+                    <button class="btn-action btn-csv" onclick="exportarFacturasCSV()"><i class="bi bi-filetype-csv"></i> Exportar Historial</button>
+                </div>
+                <div class="form-row" style="margin-bottom:12px;">
+                    <div class="input-box"><label>Filtrar por Proveedor</label><input type="text" id="filtro_fac_proveedor" placeholder="Buscar proveedor..." oninput="renderHistorialFacturas()"></div>
+                </div>
+                <div class="table-responsive" id="facturasTableContainer">
+                    <table><thead><tr><th>Correlativo</th><th>Proveedor</th><th>RUT</th><th>Fecha de Ingreso</th><th>Artículos Cargados</th></tr></thead><tbody id="historialFacturasBody"></tbody></table>
+                    <div class="pagination-container" id="paginationFacturas">
+                        <div class="pagination-info">Mostrando <strong id="facturasDesde">0</strong> - <strong id="facturasHasta">0</strong> de <strong id="facturasTotal">0</strong> registros</div>
+                        <div class="pagination" id="paginationFacturasButtons"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: COLABORADORES (ACTUALIZADA CON GÉNERO) -->
+        <!-- ===================================== -->
+        <div id="view-colaboradores" class="view-panel">
+            <div class="card">
+                <p class="card-title">➕ Agregar Nuevo Personal de Sede</p>
+                <form id="colaboradorForm" class="form-row" onsubmit="return false;">
+                    <div class="input-box"><label>RUT (Ej: 12345678-K)</label><input type="text" id="col_rut" placeholder="12345678-K" maxlength="10" required></div>
+                    <div class="input-box"><label>Nombre</label><input type="text" id="col_nombre" placeholder="Primer Nombre" required></div>
+                    <div class="input-box"><label>Apellido</label><input type="text" id="col_apellido" placeholder="Primer Apellido" required></div>
+                    <div class="input-box"><label>Correo</label><input type="email" id="col_correo" placeholder="Opcional"></div>
+                    <div class="input-box"><label>Cargo</label><select id="col_cargo"><option>Staff Normal</option><option>Mantención</option><option>Staff VIP</option><option>Supervisor</option></select></div>
+                    <div class="input-box"><label>T. Superior</label><select id="col_t_sup"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>3XL</option><option>4XL</option><option>5XL</option></select></div>
+                    <div class="input-box"><label>T. Inferior</label><select id="col_t_inf"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>3XL</option><option>4XL</option><option>5XL</option></select></div>
+                    <div class="input-box"><label>N° Zapatos</label><input type="text" id="col_t_calz" placeholder="36-44" required></div>
+                    <div class="input-box"><label>Género</label>
+                        <select id="col_genero">
+                            <option value="no_responde">No responde</option>
+                            <option value="hombre">Hombre</option>
+                            <option value="mujer">Mujer</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-action btn-gold" onclick="añadirAColaMasiva()">➕ Añadir a Lista</button>
+                    <button type="button" class="btn-action" onclick="guardarColaboradoresMasivos()" style="background-color: #22C55E;">
+                        💾 Guardar Todo en Sede
+                    </button>
+                </form>
+            </div>
+
+            <div class="card" id="cardCargaMasiva" style="display:none; border: 2px dashed var(--accent);">
+                <p class="card-title">⏳ Personal Pendiente de Registro <span id="contadorMasiva" style="font-size:0.8rem; color:var(--text-muted);"></span></p>
+                <div class="table-responsive">
+                    <table><thead><tr><th>RUT</th><th>Nombre</th><th>Cargo</th><th>Tallas</th><th>Género</th><th>Acción</th></tr></thead><tbody id="masivaTableBody"></tbody></table>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="card-title">Nómina Activa de la Sucursal</p>
+                <div class="table-responsive">
+                    <table><thead><tr><th>RUT</th><th>Nombre Completo</th><th>Cargo</th><th>Tallas (Sup/Inf/Calzado)</th><th>Género</th><th style="text-align:center;">Acciones</th></tr></thead><tbody id="colaboradoresTableBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: ENTREGAS                       -->
+        <!-- ===================================== -->
+        <div id="view-entregas" class="view-panel">
+            <div class="card">
+                <p class="card-title">Despacho de Dotación Obligatoria</p>
+                <div class="visor-tallas" id="ent_visor_tallas">👕 Selecciona un colaborador para ver sus tallas</div>
+                <div class="form-row">
+                    <div class="input-box"><label>Colaborador</label><select id="ent_combo_colab" onchange="actualizarVisorTallas()"></select></div>
+                    <div class="input-box"><label>Prenda</label><select id="ent_combo_stock"></select></div>
+                    <div class="input-box"><label>Cantidad</label><input type="number" id="ent_cantidad" value="1" min="1"></div>
+                    <button class="btn-action btn-gold" onclick="añadirAColaEntrega()">➕ Añadir a Lista</button>
+                </div>
+                <div class="table-responsive" id="divColaEntrega" style="display:none; margin-top:12px;">
+                    <table><thead><tr><th>Prenda</th><th>Talla</th><th>Cant</th><th>Acción</th></tr></thead><tbody id="colaEntregaBody"></tbody></table>
+                    <button class="btn-action" style="width:100%; margin-top:8px;" onclick="confirmarEntregaMasiva()">💾 Confirmar Entrega Masiva</button>
+                </div>
+            </div>
+
+            <!-- Historial de entregas con CSV -->
+            <div class="card">
+                <div class="card-title">
+                    <span>📜 Historial de Entregas Realizadas</span>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-action btn-success-custom" id="btnExportarTodo" style="font-size:0.75rem; padding:6px 12px; height:auto; border-radius:8px;">
+                            <i class="bi bi-filetype-csv"></i> Exportar Todo
+                        </button>
+                        <button class="btn-action btn-csv" id="btnDescargarSeleccionados" disabled style="font-size:0.75rem; padding:6px 12px; height:auto; border-radius:8px;">
+                            <i class="bi bi-check2-square"></i> Descargar Selección
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:40px;"><input type="checkbox" id="selectAllEntregas"></th>
+                                <th>Fecha / Hora</th>
+                                <th>Colaborador</th>
+                                <th>Prenda Asignada</th>
+                                <th>Talla</th>
+                                <th>Cant</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyEntregas"></tbody>
+                    </table>
+                    <div class="pagination-info" style="margin-top:12px;">
+                        Mostrando <strong id="inicioEntregas">0</strong> - <strong id="finEntregas">0</strong> de <strong id="totalEntregas">0</strong> registros
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSVs Generados -->
+            <div class="card">
+                <div class="card-title">
+                    <span>📁 CSVs Generados Anteriormente</span>
+                    <button class="btn-action btn-csv" onclick="cargarHistorialCSVGenerados()" style="font-size:0.75rem; padding:6px 12px; height:auto; border-radius:8px;">
+                        <i class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                </div>
+                <p class="card-subtitle">Archivos CSV disponibles para descarga. Expiran automáticamente a los 30 días.</p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Fecha Generación</th>
+                                <th>Registros</th>
+                                <th>Expira</th>
+                                <th style="text-align:center;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyCsvGenerados">
+                            <tr><td colspan="5" class="text-center text-muted">Cargando CSVs generados...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: STOCK                          -->
+        <!-- ===================================== -->
+        <div id="view-stock" class="view-panel">
+            <div style="display:flex; gap:12px; margin-bottom:4px; flex-wrap:wrap;">
+                <button class="btn-action" id="btnDimInventario" style="background-color: var(--accent); flex:1; min-width:130px;" onclick="cambiarDimensionStock('inventario')"><i class="bi bi-box-seam"></i> Stock Inventario</button>
+                <button class="btn-action" id="btnDimDotacion" style="background-color: #64748b; opacity:0.6; flex:1; min-width:130px;" onclick="cambiarDimensionStock('dotacion')"><i class="bi bi-people"></i> Stock Dotación</button>
+                <button class="btn-action" id="btnDimMermas" style="background-color: #64748b; opacity:0.6; flex:1; min-width:130px;" onclick="cambiarDimensionStock('mermas')"><i class="bi bi-trash3"></i> Stock Mermado</button>
+            </div>
+
+            <div class="stock-split">
+                <div class="card">
+                    <div class="card-title">
+                        <span id="lblTituloTablaStock">📦 Inventario Disponible en Estanterías de Sede</span>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-action" style="background-color:var(--success); padding:6px 12px; font-size:0.75rem; height:auto; border-radius:8px;" onclick="abrirModalStockManual()"><i class="bi bi-plus-circle"></i> Ingresar</button>
+                            <button class="btn-action btn-csv" onclick="exportarStockConsolidadoMaestroCSV()"><i class="bi bi-database-down"></i> Consolidado</button>
+                            <button class="btn-action btn-csv" onclick="exportarStockCSV()"><i class="bi bi-filetype-csv"></i> CSV</button>
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:12px;">
+                        <div class="input-box"><label>Filtrar por Nombre de Prenda o Colaborador</label><input type="text" id="filtro_stock_nombre" placeholder="Buscar..." oninput="filtrarTablaStockLocal()"></div>
+                    </div>
+                    <div class="table-responsive" style="max-height:380px; overflow-y:auto;">
+                        <table><thead><tr id="thStockHeaders"><th>ID</th><th>Producto / Descripción</th><th>Talla</th><th>Cantidad</th><th>Valor Unit.</th><th>Valor Total</th></tr></thead><tbody id="stockTableBody"></tbody></table>
+                    </div>
+                </div>
+                <div class="card chart-card" style="display:flex; flex-direction:column; justify-content:flex-start; align-items:center; gap:16px;">
+                    <div style="width:100%; display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--accent-soft); border-radius:10px; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <i class="bi bi-coin" style="font-size:1.2rem; color:var(--accent);"></i>
+                            <span style="font-weight:600; font-size:0.85rem; color:var(--text-secondary);">Valor Total:</span>
+                            <span id="valorTotalStock" style="font-weight:800; font-size:1.1rem; color:var(--accent);">$0</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; font-size:0.75rem; color:var(--text-muted);">
+                            <span id="totalUnidadesStock">0 unidades</span>
+                            <span style="opacity:0.3;">|</span>
+                            <span id="totalItemsStock">0 ítems</span>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="height:200px; width:100%;"><canvas id="stockChart"></canvas></div>
+                    <div id="chartLegendContainer" style="width:100%; display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; padding-top:8px; border-top:1px solid var(--border-soft);"></div>
+                </div>
+            </div>
+            
+            <div class="card" style="border:1px solid var(--danger);">
+                <p class="card-title" style="color:var(--danger)">⚠️ Salida de Stock Controlada (Stock Out)</p>
+                <div class="form-row">
+                    <div class="input-box"><label>Origen de la Salida</label><select id="out_origen" onchange="alternarOrigenStockOut()"><option value="inventario">Inventario Sede</option><option value="dotacion">Dotación Colaborador</option></select></div>
+                    <div class="input-box" id="out_box_colab" style="display:none;"><label>Colaborador de Origen</label><select id="out_combo_colab" onchange="cargarPrendasStockOut()"></select></div>
+                    <div class="input-box"><label>Motivo / Tipo Salida</label><select id="out_tipo_salida"></select></div>
+                    <div class="input-box"><label>Seleccionar Prenda</label><select id="out_combo_prenda"></select></div>
+                    <div class="input-box"><label>Cantidad</label><input type="number" id="out_cantidad" placeholder="1"></div>
+                    <button class="btn-action btn-danger-custom" onclick="confirmarStockOut()">🔥 Procesar Egreso</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: SOLICITUDES                    -->
+        <!-- ===================================== -->
+        <div id="view-solicitudes" class="view-panel">
+            <div class="card" style="border-top:4px solid var(--accent);">
+                <p class="card-title" style="color:var(--accent);"><i class="bi bi-shield-exclamation"></i> Crear Requerimiento</p>
+                <p class="card-subtitle">Levanta un ticket formal para que Jefatura disuelva el folio e incremente el balance.</p>
+                <div class="input-box" style="margin-bottom:12px;">
+                    <label>Seleccionar Factura Cargada</label>
+                    <select id="adm_combo_facturas"><option value="">Cargando historial de folios...</option></select>
+                </div>
+                <div class="input-box" style="margin-bottom:16px;">
+                    <label>Justificación / Motivo Técnico</label>
+                    <textarea id="adm_motivo_anulacion" rows="3" style="width:100%; padding:10px 14px; background-color:var(--bg-input); border:1px solid var(--border); border-radius:10px; color:var(--text-primary); outline:none; resize:vertical;" placeholder="Ej: Error de digitación en cantidades de lote..."></textarea>
+                </div>
+                <button class="btn-action" style="width:100%;" onclick="enviarSolicitudAnulacionAdmin()"><i class="bi bi-send-check"></i> Enviar al Panel Admin</button>
+            </div>
+
+            <div class="card">
+                <p class="card-title"><i class="bi bi-journal-text"></i> Estado y Resoluciones de tus Tickets</p>
+                <p class="card-subtitle">Seguimiento de auditorías aprobadas o rechazadas por la administración.</p>
+                <div class="form-row" style="margin-bottom:16px; background:var(--bg-input); padding:12px; border-radius:10px; border:1px solid var(--border-soft);">
+                    <div class="input-box"><label><i class="bi bi-search"></i> Buscar por Proveedor</label><input type="text" id="filtro_sol_proveedor" placeholder="Ej: Distribuidora..." oninput="filtrarHistorialSolicitudes()"></div>
+                    <div class="input-box"><label><i class="bi bi-hash"></i> N° Correlativo Factura</label><input type="number" id="filtro_sol_correlativo" placeholder="Ej: 4512" oninput="filtrarHistorialSolicitudes()"></div>
+                </div>
+                <div class="table-responsive" id="solicitudesTableContainer" style="max-height:450px; overflow-y:auto;">
+                    <table><thead><tr><th style="width:10%;">ID Ticket</th><th style="width:12%;">ID Interno</th><th style="width:15%;">N° Correlativo</th><th style="width:20%;">Proveedor</th><th style="width:13%;">Fecha</th><th style="width:12%;text-align:center;">Estado</th><th style="width:18%;">Observación Admin</th></tr></thead><tbody id="tbody_historial_solicitudes"></tbody></table>
+                    <div class="pagination-container" id="paginationSolicitudes">
+                        <div class="pagination-info">Mostrando <strong id="solicitudesDesde">0</strong> - <strong id="solicitudesHasta">0</strong> de <strong id="solicitudesTotal">0</strong> registros</div>
+                        <div class="pagination" id="paginationSolicitudesButtons"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: TRANSFERENCIAS                 -->
+        <!-- ===================================== -->
+        <div id="view-traslados" class="view-panel">
+            <div style="display:flex; gap:12px; margin-bottom:4px;">
+                <button class="btn-action" id="btnTransfStock" style="flex:1; background-color:var(--accent);" onclick="toggleTransferencia('stock')"><i class="bi bi-box-seam"></i> Solicitar Transferencia Stock</button>
+                <button class="btn-action" id="btnTransfColab" style="flex:1; background-color:#64748b; opacity:0.6;" onclick="toggleTransferencia('colaborador')"><i class="bi bi-people"></i> Solicitar Transferencia Colaborador</button>
+            </div>
+
+            <div class="card" id="form-transf-stock">
+                <p class="card-title" style="color:var(--accent);">📦 Formulario Traslado de Stock</p>
+                <p class="card-subtitle">Solicita el envío de inventario a otra sede.</p>
+                <div class="form-row">
+                    <div class="input-box"><label>Prenda a Transferir</label><select id="transf_stock_prenda"></select></div>
+                    <div class="input-box"><label>Cantidad Físicas</label><input type="number" id="transf_stock_cant" placeholder="1" min="1"></div>
+                    <div class="input-box"><label>Sede Destino</label><select class="combo_sedes_destino" id="transf_stock_destino"></select></div>
+                    <div class="input-box"><label>Motivo</label><input type="text" id="transf_stock_motivo" placeholder="Ej: Apoyo por quiebre de stock"></div>
+                    <button class="btn-action" onclick="enviarSolicitudTransferencia('stock')">Enviar Solicitud</button>
+                </div>
+            </div>
+
+            <div class="card" id="form-transf-colab" style="display:none; border-top:4px solid var(--accent);">
+                <p class="card-title" style="color:var(--accent);">👥 Formulario Traslado de Colaborador</p>
+                <p class="card-subtitle">El colaborador se transferirá junto con toda la indumentaria que tenga asignada actualmente.</p>
+                <div class="form-row">
+                    <div class="input-box"><label>Seleccionar Personal</label><select id="transf_colab_persona"></select></div>
+                    <div class="input-box"><label>Sede Destino</label><select class="combo_sedes_destino" id="transf_colab_destino"></select></div>
+                    <div class="input-box"><label>Motivo</label><input type="text" id="transf_colab_motivo" placeholder="Ej: Reubicación temporal"></div>
+                    <button class="btn-action" onclick="enviarSolicitudTransferencia('colaborador')">Enviar Solicitud</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="card-title"><i class="bi bi-journal-text"></i> Historial de Solicitudes de Transferencia</p>
+                <div class="table-responsive" id="transferenciasTableContainer">
+                    <table><thead><tr><th>ID</th><th>Tipo</th><th>Detalle</th><th>Destino</th><th>Fecha</th><th>Estado</th></tr></thead><tbody id="historialTransferenciasBody"></tbody></table>
+                    <div class="pagination-container" id="paginationTransferencias">
+                        <div class="pagination-info">Mostrando <strong id="transferenciasDesde">0</strong> - <strong id="transferenciasHasta">0</strong> de <strong id="transferenciasTotal">0</strong> registros</div>
+                        <div class="pagination" id="paginationTransferenciasButtons"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- VISTA: RECEPCIÓN DE TRANSFERENCIAS     -->
+        <!-- ===================================== -->
+        <div id="view-recepcion" class="view-panel">
+            <div class="card">
+                <p class="card-title" style="color:var(--accent);"><i class="bi bi-box-arrow-in-down"></i> Lotes Pendientes de Confirmación</p>
+                <p class="card-subtitle">Confirma la llegada física del lote completo para cargarlo al inventario, o recházalo si hay un problema (el stock vuelve al origen).</p>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>ID Lote</th><th>Origen</th><th>Ítems</th><th>Motivo</th><th>Fecha Envío</th><th style="text-align:center;">Acciones</th></tr></thead>
+                        <tbody id="lotesPendientesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="card-title"><i class="bi bi-journal-text"></i> Historial de Lotes Recibidos/Rechazados</p>
+                <div class="table-responsive" id="lotesHistorialTableContainer">
+                    <table><thead><tr><th>ID Lote</th><th>Origen</th><th>Ítems</th><th>Estado</th><th>Fecha Resolución</th><th>Observación</th></tr></thead><tbody id="lotesHistorialBody"></tbody></table>
+                    <div class="pagination-container" id="paginationLotesHistorial">
+                        <div class="pagination-info">Mostrando <strong id="lotesHistorialDesde">0</strong> - <strong id="lotesHistorialHasta">0</strong> de <strong id="lotesHistorialTotal">0</strong> registros</div>
+                        <div class="pagination" id="paginationLotesHistorialButtons"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- MODALES                                -->
+    <!-- ===================================== -->
+    <div class="modal-overlay" id="editColaboradorModal">
+        <div class="modal-content">
+            <h3 style="font-weight:700; margin-bottom:4px;">📝 Editar Ficha del Colaborador</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">Modifica los campos del colaborador de manera organizada.</p>
+            <div class="modal-grid">
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="font-size:0.8rem; font-weight:bold; color:var(--accent); border-bottom:1px solid var(--border-soft); padding-bottom:4px;">Datos de Identidad</p>
+                    <div class="input-box"><label>RUT</label><input type="text" id="edit_col_rut"></div>
+                    <div class="input-box"><label>Nombre</label><input type="text" id="edit_col_nombre"></div>
+                    <div class="input-box"><label>Apellido</label><input type="text" id="edit_col_apellido"></div>
+                    <div class="input-box"><label>Correo</label><input type="email" id="edit_col_correo"></div>
+                    <div class="input-box"><label>Género</label>
+                        <select id="edit_col_genero">
+                            <option value="no_responde">No responde</option>
+                            <option value="hombre">Hombre</option>
+                            <option value="mujer">Mujer</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <p style="font-size:0.8rem; font-weight:bold; color:var(--accent); border-bottom:1px solid var(--border-soft); padding-bottom:4px;">Perfil y Tallas</p>
+                    <div class="input-box"><label>Cargo / Rol</label><select id="edit_col_cargo"><option>Staff Normal</option><option>Mantención</option><option>Staff VIP</option><option>Supervisor</option></select></div>
+                    <div class="input-box"><label>Talla Superior</label><select id="edit_col_t_sup"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>3XL</option><option>4XL</option><option>5XL</option></select></div>
+                    <div class="input-box"><label>Talla Inferior</label><select id="edit_col_t_inf"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>3XL</option><option>4XL</option><option>5XL</option></select></div>
+                    <div class="input-box"><label>N° Zapatos</label><input type="text" id="edit_col_t_calz"></div>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px; border-top:1px solid var(--border-soft); padding-top:12px;">
+                <button class="btn-action" style="background:#64748b; flex:1;" onclick="closeModalColab()">Cancelar</button>
+                <button class="btn-action" style="flex:1;" onclick="guardarEdicionColaborador()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalStockManual">
+        <div class="modal-content" style="max-width:400px;">
+            <h3 style="font-weight:700;">➕ Ingreso Manual de Stock</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Agrega inventario directo sin necesidad de un folio.</p>
+            <div class="input-box"><label>Prenda a Ingresar</label><select id="manual_combo_prenda"></select></div>
+            <div class="input-box"><label>Cantidad Física</label><input type="number" id="manual_cantidad" placeholder="Ej: 50"></div>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+                <button class="btn-action" style="background:#64748b; flex:1;" onclick="document.getElementById('modalStockManual').style.display='none'">Cancelar</button>
+                <button class="btn-action" style="flex:1; background:var(--success);" onclick="guardarStockManual()">Confirmar Ingreso</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="appDialogOverlay">
+        <div class="modal-content" style="max-width:440px;">
+            <h3 id="appDialogTitle" style="font-weight:700;"></h3>
+            <p id="appDialogMessage" style="color:var(--text-secondary); white-space:pre-line; font-size:0.9rem; margin:0;"></p>
+            <textarea id="appDialogInput" rows="3" style="display:none; width:100%; background:var(--bg-input); border:1px solid var(--border-soft); border-radius:8px; padding:10px; color:var(--text-primary); font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+            <div id="appDialogButtons" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;"></div>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- LOGICA JAVASCRIPT                     -->
+    <!-- ===================================== -->
+    <script>
+        // ==========================================
+        // INTERCEPTOR DE FETCH: agrega el token de sesión
+        // automáticamente a cada llamada a la API (ISO 27001 - A.9)
+        // ==========================================
+        (function () {
+            const fetchOriginal = window.fetch;
+            window.fetch = async function (url, options = {}) {
+                const esRelativa = typeof url === 'string' && url.startsWith('/');
+                if (esRelativa) {
+                    const token = localStorage.getItem('access_token');
+                    options.headers = { ...(options.headers || {}), Authorization: `Bearer ${token}` };
+                }
+                const response = await fetchOriginal(url, options);
+                if (esRelativa && response.status === 401) {
+                    localStorage.clear();
+                    alert('Tu sesión expiró o no es válida. Inicia sesión nuevamente.');
+                    window.location.href = '/login';
+                }
+                return response;
+            };
+        })();
+
+        // ==========================================
+        // VARIABLES GLOBALES
+        // ==========================================
+        const id_sucursal = localStorage.getItem('id_suc');
+        const id_usuario = localStorage.getItem('id_usuario');
+        const nombre_sucursal = localStorage.getItem('nombre_suc');
+
+        if (!id_sucursal || !id_usuario || localStorage.getItem('rol') === 'admin') {
+            alert("Sesión inválida. Por favor, inicia sesión nuevamente.");
+            window.location.href = '/';
+        }
+
+        document.getElementById('lblBranchSessionInfo').innerText = `${nombre_sucursal || "Sede Local"} (ID: #${id_sucursal})`;
+
+        let itemsFacturaTemporal = [];
+        let colaboradoresCache = {};
+        let stockCacheGlobal = [];
+        let facturasHistorialCache = [];
+        let entregasHistorialCache = [];
+        let solicitudesHistorialCache = [];
+        let transferenciasHistorialCache = [];
+        let selectedColaboradorId = null;
+        let stockChartInstance = null;
+        let listaCargaMasiva = [];
+        let colaEntrega = [];
+        let modoTransferencia = 'stock';
+        let csvGeneradosData = [];
+        let dimensionActiva = 'inventario';
+        let cacheDotacionConsolidada = [];
+        let lotesRecepcionCache = [];
+
+        // ==========================================
+        // PAGINACIÓN
+        // ==========================================
+        const ITEMS_PER_PAGE = 10;
+
+        function renderPagination(data, containerId, infoId, page = 1) {
+            const totalItems = data.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            const currentPage = Math.min(Math.max(page, 1), totalPages || 1);
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = Math.min(start + ITEMS_PER_PAGE, totalItems);
+            
+            const fromEl = document.getElementById(`${infoId}Desde`);
+            const toEl = document.getElementById(`${infoId}Hasta`);
+            const totalEl = document.getElementById(`${infoId}Total`);
+            
+            if (fromEl) fromEl.textContent = totalItems > 0 ? start + 1 : 0;
+            if (toEl) toEl.textContent = end;
+            if (totalEl) totalEl.textContent = totalItems;
+
+            const buttonsContainer = document.getElementById(`${containerId}Buttons`);
+            if (!buttonsContainer) return { start, end, currentPage };
+
+            buttonsContainer.innerHTML = '';
+
+            const prevBtn = document.createElement('button');
+            prevBtn.innerHTML = '‹';
+            prevBtn.disabled = currentPage <= 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    const newPage = currentPage - 1;
+                    renderPagination(data, containerId, infoId, newPage);
+                    if (containerId === 'paginationFacturas') renderizarTablaFacturas(data, newPage);
+                    else if (containerId === 'paginationEntregas') renderizarTablaEntregas(data, newPage);
+                    else if (containerId === 'paginationSolicitudes') renderizarTablaSolicitudes(data, newPage);
+                    else if (containerId === 'paginationTransferencias') renderizarTablaTransferencias(data, newPage);
+                    else if (containerId === 'paginationLotesHistorial') renderizarTablaLotesHistorial(data, newPage);
+                }
+            };
+            buttonsContainer.appendChild(prevBtn);
+
+            const maxVisible = 7;
+            let startPage = 1;
+            let endPage = totalPages;
+
+            if (totalPages > maxVisible) {
+                const half = Math.floor(maxVisible / 2);
+                if (currentPage <= half + 1) {
+                    endPage = maxVisible;
+                } else if (currentPage >= totalPages - half) {
+                    startPage = totalPages - maxVisible + 1;
+                } else {
+                    startPage = currentPage - half;
+                    endPage = currentPage + half;
+                }
+            }
+
+            if (startPage > 1) {
+                const firstBtn = document.createElement('button');
+                firstBtn.textContent = '1';
+                firstBtn.onclick = () => {
+                    renderPagination(data, containerId, infoId, 1);
+                    if (containerId === 'paginationFacturas') renderizarTablaFacturas(data, 1);
+                    else if (containerId === 'paginationEntregas') renderizarTablaEntregas(data, 1);
+                    else if (containerId === 'paginationSolicitudes') renderizarTablaSolicitudes(data, 1);
+                    else if (containerId === 'paginationTransferencias') renderizarTablaTransferencias(data, 1);
+                    else if (containerId === 'paginationLotesHistorial') renderizarTablaLotesHistorial(data, 1);
+                };
+                buttonsContainer.appendChild(firstBtn);
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('button');
+                    ellipsis.textContent = '…';
+                    ellipsis.className = 'ellipsis';
+                    buttonsContainer.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                if (i === currentPage) btn.className = 'active';
+                btn.onclick = () => {
+                    renderPagination(data, containerId, infoId, i);
+                    if (containerId === 'paginationFacturas') renderizarTablaFacturas(data, i);
+                    else if (containerId === 'paginationEntregas') renderizarTablaEntregas(data, i);
+                    else if (containerId === 'paginationSolicitudes') renderizarTablaSolicitudes(data, i);
+                    else if (containerId === 'paginationTransferencias') renderizarTablaTransferencias(data, i);
+                    else if (containerId === 'paginationLotesHistorial') renderizarTablaLotesHistorial(data, i);
+                };
+                buttonsContainer.appendChild(btn);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('button');
+                    ellipsis.textContent = '…';
+                    ellipsis.className = 'ellipsis';
+                    buttonsContainer.appendChild(ellipsis);
+                }
+                const lastBtn = document.createElement('button');
+                lastBtn.textContent = totalPages;
+                lastBtn.onclick = () => {
+                    renderPagination(data, containerId, infoId, totalPages);
+                    if (containerId === 'paginationFacturas') renderizarTablaFacturas(data, totalPages);
+                    else if (containerId === 'paginationEntregas') renderizarTablaEntregas(data, totalPages);
+                    else if (containerId === 'paginationSolicitudes') renderizarTablaSolicitudes(data, totalPages);
+                    else if (containerId === 'paginationTransferencias') renderizarTablaTransferencias(data, totalPages);
+                    else if (containerId === 'paginationLotesHistorial') renderizarTablaLotesHistorial(data, totalPages);
+                };
+                buttonsContainer.appendChild(lastBtn);
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.innerHTML = '›';
+            nextBtn.disabled = currentPage >= totalPages;
+            nextBtn.onclick = () => {
+                if (currentPage < totalPages) {
+                    const newPage = currentPage + 1;
+                    renderPagination(data, containerId, infoId, newPage);
+                    if (containerId === 'paginationFacturas') renderizarTablaFacturas(data, newPage);
+                    else if (containerId === 'paginationEntregas') renderizarTablaEntregas(data, newPage);
+                    else if (containerId === 'paginationSolicitudes') renderizarTablaSolicitudes(data, newPage);
+                    else if (containerId === 'paginationTransferencias') renderizarTablaTransferencias(data, newPage);
+                    else if (containerId === 'paginationLotesHistorial') renderizarTablaLotesHistorial(data, newPage);
+                }
+            };
+            buttonsContainer.appendChild(nextBtn);
+
+            return { start, end, currentPage };
+        }
+
+        // ==========================================
+        // TOAST
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', warning: 'bi-exclamation-triangle-fill', info: 'bi-info-circle-fill' };
+            toast.innerHTML = `<i class="bi ${icons[type] || icons.info}" style="margin-right:8px;"></i>`;
+            toast.appendChild(document.createTextNode(message));
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(30px)';
+                setTimeout(() => toast.remove(), 250);
+            }, 2800);
+        }
+
+        // ==========================================
+        // DIÁLOGOS PROPIOS (reemplazan confirm()/prompt() nativos)
+        // ==========================================
+        function _appDialogOpen({ title, message, showInput = false, inputPlaceholder = '', buttons }) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('appDialogOverlay');
+                document.getElementById('appDialogTitle').innerText = title;
+                document.getElementById('appDialogMessage').innerText = message;
+                const input = document.getElementById('appDialogInput');
+                input.style.display = showInput ? 'block' : 'none';
+                input.value = '';
+                input.placeholder = inputPlaceholder;
+
+                const btnContainer = document.getElementById('appDialogButtons');
+                btnContainer.innerHTML = '';
+
+                const finish = (value) => {
+                    overlay.style.display = 'none';
+                    overlay.onclick = null;
+                    resolve({ value, text: input.value });
+                };
+
+                buttons.forEach(b => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn-action';
+                    btn.innerText = b.label;
+                    if (b.style === 'danger') btn.style.background = 'var(--danger)';
+                    else if (b.style === 'muted') btn.style.background = '#64748b';
+                    btn.onclick = () => finish(b.value);
+                    btnContainer.appendChild(btn);
+                });
+
+                overlay.onclick = (e) => { if (e.target === overlay) finish(false); };
+                overlay.style.display = 'flex';
+                if (showInput) setTimeout(() => input.focus(), 50);
+            });
+        }
+
+        async function appConfirm(message, { title = 'Confirmar acción', confirmText = 'Confirmar', cancelText = 'Cancelar', danger = false } = {}) {
+            const res = await _appDialogOpen({
+                title, message, showInput: false,
+                buttons: [
+                    { value: false, label: cancelText, style: 'muted' },
+                    { value: true, label: confirmText, style: danger ? 'danger' : 'default' }
+                ]
+            });
+            return res.value === true;
+        }
+
+        async function appPrompt(message, { title = 'Ingresa un valor', placeholder = '', confirmText = 'Aceptar', cancelText = 'Cancelar' } = {}) {
+            const res = await _appDialogOpen({
+                title, message, showInput: true, inputPlaceholder: placeholder,
+                buttons: [
+                    { value: false, label: cancelText, style: 'muted' },
+                    { value: true, label: confirmText, style: 'default' }
+                ]
+            });
+            return res.value === true ? res.text : null;
+        }
+
+        async function appChoice(message, options, { title = 'Selecciona una opción' } = {}) {
+            const res = await _appDialogOpen({
+                title, message, showInput: false,
+                buttons: [
+                    ...options.map(o => ({ value: o.value, label: o.label, style: o.style || 'default' })),
+                    { value: null, label: 'Cancelar', style: 'muted' }
+                ]
+            });
+            return res.value;
+        }
+
+        // ==========================================
+        // NAVEGACIÓN
+        // ==========================================
+        function switchView(viewName, element) {
+            document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-menu .nav-item').forEach(i => {
+                if(i.id !== 'themeToggle') i.classList.remove('active');
+            });
+            
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            if(element && element.id !== 'themeToggle') element.classList.add('active');
+            
+            const headers = {
+                'home': ['📊 Resumen Ejecutivo', 'Vista general de operaciones, métricas y alertas críticas de la sede.'],
+                'facturas': ['📜 Registro e Ingreso de Facturas', 'Ingresa las compras de insumos para actualizar el inventario físico.'],
+                'colaboradores': ['👥 Personal / Colaboradores de Sede', 'Administra el personal interno y revisa sus tallas asignadas.'],
+                'entregas': ['👕 Asignación y Despacho de Uniformes', 'Entrega indumentaria corporativa rebajando el stock físico de la sede.'],
+                'stock': ['📊 Inventario Disponible y Egresos', 'Monitoreo analítico de stock disponible y mermas por desgaste.'],
+                'solicitudes': ['🔍 Auditoría de Solicitudes Centrales', 'Seguimiento y control de folios de anulación enviados a Jefatura Central.'],
+                'traslados': ['🚚 Logística Inter-Sede', 'Solicita transferencias de stock o colaboradores a otras sedes.'],
+                'recepcion': ['📥 Recepción de Transferencias', 'Confirma o rechaza los lotes enviados por Superadmin u otras sedes.']
+            };
+            
+            document.getElementById('viewTitle').innerText = headers[viewName][0];
+            document.getElementById('viewSubtitle').innerText = headers[viewName][1];
+            
+            if(viewName === 'home') cargarDatosHome();
+            if(viewName === 'facturas') { cargarCatalogoFacturas(); renderHistorialFacturas(); }
+            if(viewName === 'colaboradores') cargarColaboradores();
+            if(viewName === 'entregas') { 
+                cargarDatosEntrega(); 
+                cargarHistorialEntregas();
+                cargarHistorialCSVGenerados();
+            } 
+            if(viewName === 'stock') { cambiarDimensionStock('inventario'); alternarOrigenStockOut(); }
+            if(viewName === 'solicitudes') { cargarComboFacturasParaAnulacion(); renderHistorialSolicitudesSede(); }
+            if(viewName === 'traslados') { 
+                cargarSedesDestino(); 
+                cargarPrendasParaTransferir(); 
+                cargarColaboradoresParaTransferir();
+                cargarHistorialTransferencias();
+                toggleTransferencia('stock');
+            }
+            if(viewName === 'recepcion') cargarLotesRecepcion();
+        }
+
+        // ==========================================
+        // TEMA OSCURO/CLARO
+        // ==========================================
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                document.getElementById('themeText').innerText = 'Modo Claro';
+                document.getElementById('themeIcon').className = 'bi bi-sun';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                document.getElementById('themeText').innerText = 'Modo Cine';
+                document.getElementById('themeIcon').className = 'bi bi-moon-stars';
+            }
+        });
+
+        // ==========================================
+        // HOME - CARGA DE DATOS ACTUALIZADA
+        // ==========================================
+        async function cargarDatosHome() {
+            try {
+                const [resInv, resEnt, resCol, resDot, resHistorialEntregas] = await Promise.all([
+                    fetch(`/api/sucursal/inventario-completo/${id_sucursal}`),
+                    fetch(`/api/sucursal/entregas-historial/${id_sucursal}`),
+                    fetch(`/api/sucursal/colaboradores/${id_sucursal}`),
+                    fetch(`/api/sucursal/dotacion-consolidada/${id_sucursal}`),
+                    fetch(`/api/sucursal/entregas-historial/${id_sucursal}`)
+                ]);
+                
+                let inventario = await resInv.json();
+                let entregas = await resEnt.json();
+                let colaboradores = await resCol.json();
+                let dotacion = await resDot.json();
+                let historialEntregas = await resHistorialEntregas.json();
+
+// VALIDACIÓN DEFENSIVA: Si el backend falla, forzamos arrays vacíos para evitar el crash
+                if (!Array.isArray(inventario)) inventario = [];
+                if (!Array.isArray(entregas)) entregas = [];
+                if (!Array.isArray(colaboradores)) colaboradores = [];
+                if (!Array.isArray(dotacion)) dotacion = [];
+                if (!Array.isArray(historialEntregas)) historialEntregas = [];
+                
+                // ========== KPIS EXISTENTES ==========
+                const totalStock = inventario.reduce((acc, item) => acc + item.cantidad_disponible, 0);
+                document.getElementById('kpi-stock').innerText = totalStock;
+                
+                const totalDotacion = dotacion.reduce((acc, item) => acc + item.cantidad_en_uso, 0);
+                document.getElementById('kpi-dotacion').innerText = totalDotacion;
+                
+                document.getElementById('kpi-colaboradores').innerText = colaboradores.length;
+                
+                const colabConDotacion = dotacion.filter(d => d.cantidad_en_uso > 0);
+                const colabIdsUnicos = new Set(colabConDotacion.map(d => d.id_colaborador));
+                document.getElementById('kpi-colab-dotados').innerText = colabIdsUnicos.size;
+
+                // ========== NUEVOS KPIS DE VALOR ==========
+                // Calcular valor total del stock disponible
+                let valorStock = 0;
+                inventario.forEach(item => {
+                    const precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+                    valorStock += item.cantidad_disponible * precio;
+                });
+                document.getElementById('kpi-valor-stock').innerText = `$${valorStock.toLocaleString()}`;
+
+                // Calcular valor total de la dotación en uso
+                let valorDotacion = 0;
+                dotacion.forEach(item => {
+                    const precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+                    valorDotacion += item.cantidad_en_uso * precio;
+                });
+                document.getElementById('kpi-valor-dotacion').innerText = `$${valorDotacion.toLocaleString()}`;
+
+                // Calcular valor total de las mermas
+                let valorMermas = 0;
+                inventario.forEach(item => {
+                    const precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+                    valorMermas += (item.cantidad_merma || 0) * precio;
+                });
+                document.getElementById('kpi-valor-mermas').innerText = `$${valorMermas.toLocaleString()}`;
+
+                // Activo Total (Bodega + Dotación)
+                const activoTotal = valorStock + valorDotacion;
+                document.getElementById('kpi-total-activo').innerText = `$${activoTotal.toLocaleString()}`;
+
+                // ========== PRODUCTOS CON MAYOR Y MENOR ROTACIÓN ==========
+                // Contar entregas por producto
+                const conteoProductos = {};
+                historialEntregas.forEach(entrega => {
+                    const detalles = entrega.detalle_entrega || [];
+                    detalles.forEach(d => {
+                        const id = d.id_producto;
+                        const nombre = d.producto_catalogo?.nombre_item || `Producto #${id}`;
+                        const cantidad = d.cantidad || 0;
+                        if (!conteoProductos[id]) {
+                            conteoProductos[id] = { nombre, cantidad: 0 };
+                        }
+                        conteoProductos[id].cantidad += cantidad;
+                    });
+                });
+
+                const productosArray = Object.values(conteoProductos);
+                
+                if (productosArray.length > 0) {
+                    // Ordenar por cantidad (mayor a menor)
+                    productosArray.sort((a, b) => b.cantidad - a.cantidad);
+                    
+                    // Mayor rotación
+                    const mayor = productosArray[0];
+                    document.getElementById('productoMayorRotacion').innerHTML = `
+                        <span style="color:var(--success);">${mayor.nombre}</span>
+                        <small>${mayor.cantidad} entregas</small>
+                    `;
+                    
+                    // Menor rotación (el que tiene más de 0 entregas pero menos cantidad)
+                    const menor = productosArray[productosArray.length - 1];
+                    if (menor.cantidad > 0) {
+                        document.getElementById('productoMenorRotacion').innerHTML = `
+                            <span style="color:var(--danger);">${menor.nombre}</span>
+                            <small>${menor.cantidad} entregas</small>
+                        `;
+                    } else {
+                        document.getElementById('productoMenorRotacion').innerHTML = `
+                            <span style="color:var(--text-muted);">Sin entregas registradas</span>
+                        `;
+                    }
+                } else {
+                    document.getElementById('productoMayorRotacion').innerHTML = 'Sin datos de entregas';
+                    document.getElementById('productoMenorRotacion').innerHTML = 'Sin datos de entregas';
+                }
+
+                // ========== ALERTAS DE QUIEBRE DE STOCK ==========
+                const alertasBody = document.getElementById('alertaStockBody');
+                alertasBody.innerHTML = '';
+                const criticos = inventario.filter(i => i.cantidad_disponible <= 3);
+                
+                if (criticos.length === 0) {
+                    alertasBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted)">No hay quiebres de stock. Todo en orden.</td></tr>';
+                } else {
+                    criticos.forEach(c => {
+                        let nombre = c.producto_catalogo?.nombre_item || "Desconocido";
+                        alertasBody.innerHTML += `<tr>
+                            <td><strong>#${c.id_producto}</strong></td>
+                            <td>${nombre}</td>
+                            <td><span class="badge active">${c.talla}</span></td>
+                            <td><strong style="color:var(--danger)">${c.cantidad_disponible}</strong></td>
+                        </tr>`;
+                    });
+                }
+            } catch (e) {
+                console.error("Error cargando home", e);
+                showToast("Error al cargar los datos del dashboard", "error");
+            }
+        }
+
+        // ==========================================
+        // FACTURAS (con paginación)
+        // ==========================================
+        async function cargarCatalogoFacturas() {
+            const res = await fetch('/api/sucursal/productos-catalogo');
+            const data = await res.json();
+            const datalist = document.getElementById('fac_productos_list');
+            datalist.innerHTML = '';
+            window.catalogoCacheLocal = data; 
+            data.forEach(p => {
+                datalist.innerHTML += `<option value="${p.id_producto} - ${p.nombre_item} [${p.talla}]"></option>`;
+            });
+        }
+
+        function agregarFilaFactura() {
+            const inputStr = document.getElementById('fac_combo_producto_input').value;
+            if(!inputStr) return;
+            
+            const idProd = parseInt(inputStr.split(' - ')[0]);
+            const producto = window.catalogoCacheLocal.find(p => p.id_producto === idProd);
+            
+            if(!producto) return showToast('Por favor, selecciona un ítem válido de la lista.', 'error');
+
+            const cant = parseInt(document.getElementById('fac_cantidad').value);
+            if(!cant || cant <= 0) return showToast('Ingresa una cantidad válida.', 'error');
+            
+            itemsFacturaTemporal.push({
+                id_producto: producto.id_producto,
+                nombre_txt: producto.nombre_item,
+                talla: producto.talla,
+                cantidad: cant
+            });
+            
+            refrescarTablaFacturas();
+            document.getElementById('fac_combo_producto_input').value = '';
+            document.getElementById('fac_cantidad').value = '';
+            showToast(`${cant} unidad(es) de "${producto.nombre_item}" añadidas a la factura`, 'success');
+        }
+
+        function refrescarTablaFacturas() {
+            const tbody = document.getElementById('facturaItemsBody');
+            tbody.innerHTML = '';
+            itemsFacturaTemporal.forEach(item => {
+                tbody.innerHTML += `<tr><td>#${item.id_producto}</td><td>${item.nombre_txt}</td><td><span class="badge active">${item.talla}</span></td><td><strong>${item.cantidad}</strong></td></tr>`;
+            });
+        }
+
+        async function confirmarFacturaCompleta() {
+            const correlativo = document.getElementById('fac_correlativo').value;
+            const rut_p = document.getElementById('fac_rut_prov').value;
+            const nom_p = document.getElementById('fac_nom_prov').value;
+            if(!correlativo || !rut_p || !nom_p || itemsFacturaTemporal.length === 0) return showToast('Por favor, rellene todas las celdas de cabecera y agregue ítems.', 'error');
+
+            const res = await fetch('/api/sucursal/facturas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    correlativo_factura: parseInt(correlativo), rut_proveedor: rut_p, nombre_proveedor: nom_p,
+                    id_sucursal: parseInt(id_sucursal), id_usuario_registra: id_usuario, items: itemsFacturaTemporal
+                })
+            });
+            if(res.ok) {
+                showToast('Factura indexada con éxito.', 'success');
+                itemsFacturaTemporal = [];
+                refrescarTablaFacturas();
+                renderHistorialFacturas();
+                
+                document.getElementById('fac_correlativo').value = '';
+                document.getElementById('fac_rut_prov').value = '';
+                document.getElementById('fac_nom_prov').value = '';
+            } else {
+                showToast('Error al registrar la factura.', 'error');
+            }
+        }
+
+        async function renderHistorialFacturas() {
+            const res = await fetch(`/api/sucursal/facturas-historial/${id_sucursal}`);
+            facturasHistorialCache = await res.json();
+            const filterText = document.getElementById('filtro_fac_proveedor').value.toLowerCase();
+            
+            let dataFiltrada = facturasHistorialCache.filter(fac => {
+                return !filterText || fac.nombre_proveedor.toLowerCase().includes(filterText);
+            });
+            
+            renderizarTablaFacturas(dataFiltrada, 1);
+        }
+
+        function renderizarTablaFacturas(data, page) {
+            const tbody = document.getElementById('historialFacturasBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No hay facturas registradas.</td></tr>';
+                document.getElementById('paginationFacturas').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('paginationFacturas').style.display = 'flex';
+            const { start, end } = renderPagination(data, 'paginationFacturas', 'facturas', page);
+            
+            for (let i = start; i < end; i++) {
+                const fac = data[i];
+                let articulos = fac.detalle_factura.map(d => `${d.producto_catalogo?.nombre_item || 'Item'} (${d.cantidad})`).join(', ');
+                tbody.innerHTML += `<tr>
+                    <td><strong>#${fac.correlativo_factura}</strong></td>
+                    <td>${fac.nombre_proveedor}</td>
+                    <td>${fac.rut_proveedor}</td>
+                    <td>${fac.fecha_ingreso.split('T')[0]}</td>
+                    <td style="font-size:0.8rem; color:var(--text-muted)">${articulos}</td>
+                </tr>`;
+            }
+        }
+
+        function exportarFacturasCSV() {
+            if(facturasHistorialCache.length === 0) return showToast('No hay datos históricos cargados.', 'warning');
+            let csvContent = "data:text/csv;charset=utf-8,Correlativo;Proveedor;RUT;Fecha\n";
+            facturasHistorialCache.forEach(f => {
+                csvContent += `${f.correlativo_factura};${f.nombre_proveedor};${f.rut_proveedor};${f.fecha_ingreso.split('T')[0]}\n`;
+            });
+            downloadCSV(csvContent, `Historial_Facturas_Sede_${id_sucursal}.csv`);
+            showToast('CSV exportado correctamente.', 'success');
+        }
+
+        // ==========================================
+        // COLABORADORES - FUNCIONES ACTUALIZADAS CON GÉNERO
+        // ==========================================
+        function validarRUT(rutCompleto) {
+            rutCompleto = rutCompleto.replace(/\./g, '').replace(/-/g, '');
+            if (rutCompleto.length < 8) return null;
+            let cuerpo = rutCompleto.slice(0, -1);
+            let dv = rutCompleto.slice(-1).toUpperCase();
+            
+            let suma = 0, multiplo = 2;
+            for (let i = cuerpo.length - 1; i >= 0; i--) {
+                suma += parseInt(cuerpo.charAt(i)) * multiplo;
+                multiplo = (multiplo === 7) ? 2 : multiplo + 1;
+            }
+            let dvEsperado = 11 - (suma % 11);
+            dvEsperado = (dvEsperado === 11) ? '0' : (dvEsperado === 10) ? 'K' : dvEsperado.toString();
+            
+            return (dv === dvEsperado) ? (cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '-' + dv) : null;
+        }
+
+        async function cargarColaboradores() {
+            const res = await fetch(`/api/sucursal/colaboradores/${id_sucursal}`);
+            const data = await res.json();
+            const tbody = document.getElementById('colaboradoresTableBody');
+            tbody.innerHTML = '';
+            colaboradoresCache = {};
+
+            data.forEach(c => {
+                colaboradoresCache[c.id_colaborador] = c;
+                const generoTexto = c.genero || 'no_responde';
+                let generoBadge = 'active';
+                if (generoTexto === 'hombre') generoBadge = 'info';
+                else if (generoTexto === 'mujer') generoBadge = 'success';
+                
+                tbody.innerHTML += `<tr>
+                    <td><strong>${c.rut}</strong></td>
+                    <td style="font-weight:600;">${c.nombre} ${c.apellido}</td>
+                    <td>${c.tipo_personal}</td>
+                    <td>${c.talla_superior} / ${c.talla_inferior} / N° ${c.talla_calzado || '0'}</td>
+                    <td><span class="badge ${generoBadge}">${generoTexto === 'no_responde' ? 'No responde' : generoTexto.charAt(0).toUpperCase() + generoTexto.slice(1)}</span></td>
+                    <td class="actions-cell">
+                        <button class="btn-edit-inline" onclick="openEditColabModal(${c.id_colaborador})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn-delete-inline" onclick="eliminarColaborador(${c.id_colaborador})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        function añadirAColaMasiva() {
+            let inputRaw = document.getElementById('col_rut').value;
+            let rutValidado = validarRUT(inputRaw);
+
+            if (!rutValidado) return showToast('RUT inválido. Verifica los números y el dígito (Ej: 12345678-K).', 'error');
+
+            if (listaCargaMasiva.find(c => c.rut === rutValidado)) return showToast('Error: Este RUT ya está en la lista pendiente.', 'error');
+
+            const existeEnNomina = Object.values(colaboradoresCache).find(c => c.rut === rutValidado);
+            if (existeEnNomina) return showToast('Error: Esta persona ya existe en la Nómina Activa.', 'error');
+
+            let correo = document.getElementById('col_correo').value.trim();
+            if (!correo) {
+                correo = `sin_correo_${rutValidado.replace(/\./g, '').replace(/-/g, '')}@cinepolis.com`;
+            }
+
+            const col = {
+                rut: rutValidado,
+                nombre: document.getElementById('col_nombre').value,
+                apellido: document.getElementById('col_apellido').value,
+                correo: correo,
+                tipo_personal: document.getElementById('col_cargo').value,
+                talla_superior: document.getElementById('col_t_sup').value,
+                talla_inferior: document.getElementById('col_t_inf').value,
+                talla_calzado: document.getElementById('col_t_calz').value,
+                genero: document.getElementById('col_genero').value
+            };
+
+            listaCargaMasiva.push(col);
+            document.getElementById('cardCargaMasiva').style.display = 'block';
+            actualizarTablaMasiva();
+            document.getElementById('colaboradorForm').reset();
+            showToast(`${col.nombre} ${col.apellido} añadido a la lista pendiente.`, 'success');
+        }
+
+        function actualizarTablaMasiva() {
+            const tbody = document.getElementById('masivaTableBody');
+            const contador = document.getElementById('contadorMasiva');
+            tbody.innerHTML = '';
+            
+            if (contador) {
+                contador.textContent = `(${listaCargaMasiva.length} pendientes)`;
+            }
+
+            listaCargaMasiva.forEach((col, index) => {
+                const tallasTexto = `${col.talla_superior} / ${col.talla_inferior} / N° ${col.talla_calzado}`;
+                const generoTexto = col.genero || 'no_responde';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${col.rut}</td>
+                        <td>${col.nombre} ${col.apellido}</td>
+                        <td>${col.tipo_personal}</td>
+                        <td>${tallasTexto}</td>
+                        <td><span class="badge active">${generoTexto === 'no_responde' ? 'No responde' : generoTexto.charAt(0).toUpperCase() + generoTexto.slice(1)}</span></td>
+                        <td style="text-align: center;">
+                            <button type="button" onclick="removerDeCola(${index})"
+                                    style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.1rem;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function removerDeCola(index) {
+            listaCargaMasiva.splice(index, 1);
+            actualizarTablaMasiva();
+            if(listaCargaMasiva.length === 0) document.getElementById('cardCargaMasiva').style.display = 'none';
+        }
+
+        async function guardarColaboradoresMasivos() {
+            if (listaCargaMasiva.length === 0) {
+                showToast('No hay colaboradores en la lista pendiente.', 'warning');
+                return;
+            }
+
+            if (!await appConfirm(`¿Estás seguro de que deseas guardar ${listaCargaMasiva.length} colaborador(es) en la nómina activa?`, { title: 'Guardar nómina pendiente' })) return;
+
+            try {
+                const res = await fetch(`/api/sucursal/colaboradores-masivo/${id_sucursal}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(listaCargaMasiva)
+                });
+
+                if (res.ok) {
+                    showToast(`${listaCargaMasiva.length} colaborador(es) registrado(s) exitosamente.`, 'success');
+                    listaCargaMasiva = [];
+                    document.getElementById('cardCargaMasiva').style.display = 'none';
+                    actualizarTablaMasiva();
+                    cargarColaboradores();
+                } else {
+                    const error = await res.json();
+                    showToast(`Error al guardar: ${error.detail || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error guardando colaboradores:', error);
+                showToast('Error de conexión al servidor.', 'error');
+            }
+        }
+
+        function openEditColabModal(id) {
+            selectedColaboradorId = id;
+            const c = colaboradoresCache[id];
+            document.getElementById('edit_col_rut').value = c.rut;
+            document.getElementById('edit_col_nombre').value = c.nombre;
+            document.getElementById('edit_col_apellido').value = c.apellido;
+            document.getElementById('edit_col_correo').value = c.correo;
+            document.getElementById('edit_col_cargo').value = c.tipo_personal;
+            document.getElementById('edit_col_t_sup').value = c.talla_superior;
+            document.getElementById('edit_col_t_inf').value = c.talla_inferior;
+            document.getElementById('edit_col_t_calz').value = c.talla_calzado || '0';
+            document.getElementById('edit_col_genero').value = c.genero || 'no_responde';
+            document.getElementById('editColaboradorModal').style.display = 'flex';
+        }
+
+        function closeModalColab() { document.getElementById('editColaboradorModal').style.display = 'none'; }
+
+        async function guardarEdicionColaborador() {
+            if (!await appConfirm('¿Estás seguro de que deseas guardar los cambios?', { title: 'Guardar cambios del colaborador' })) return;
+            
+            const res = await fetch(`/api/sucursal/colaboradores/${selectedColaboradorId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    rut: document.getElementById('edit_col_rut').value,
+                    nombre: document.getElementById('edit_col_nombre').value,
+                    apellido: document.getElementById('edit_col_apellido').value,
+                    correo: document.getElementById('edit_col_correo').value,
+                    tipo_personal: document.getElementById('edit_col_cargo').value,
+                    talla_superior: document.getElementById('edit_col_t_sup').value,
+                    talla_inferior: document.getElementById('edit_col_t_inf').value,
+                    talla_calzado: document.getElementById('edit_col_t_calz').value,
+                    genero: document.getElementById('edit_col_genero').value
+                })
+            });
+            if(res.ok) { 
+                closeModalColab(); 
+                cargarColaboradores();
+                showToast('Colaborador actualizado exitosamente.', 'success');
+            } else {
+                const error = await res.json();
+                showToast(`Error al actualizar: ${error.detail || 'Error desconocido'}`, 'error');
+            }
+        }
+
+        async function eliminarColaborador(id, accion = null) {
+            let url = `/api/sucursal/colaboradores/${id}`;
+            if (accion) url += `?accion_dotacion=${accion}`;
+            else {
+                if (!await appConfirm('¿Estás seguro de que deseas DESVINCULAR a este colaborador?', { title: 'Desvincular colaborador', danger: true, confirmText: 'Desvincular' })) return;
+            }
+
+            const res = await fetch(url, { method: 'DELETE' });
+            const data = await res.json();
+
+            if(res.ok) {
+                if (data.status === 'warning') {
+                    const opcion = await appChoice(
+                        'El colaborador tiene indumentaria en uso. ¿Qué hacemos con ella?',
+                        [
+                            { value: 'merma', label: 'No recuperar (a mermas)', style: 'danger' },
+                            { value: 'stock', label: 'Recuperar (a stock disponible)', style: 'default' }
+                        ],
+                        { title: 'Indumentaria en uso' }
+                    );
+                    if (opcion === 'merma') eliminarColaborador(id, 'merma');
+                    else if (opcion === 'stock') eliminarColaborador(id, 'stock');
+                    else showToast('Operación cancelada.', 'warning');
+                } else {
+                    showToast(data.message || 'Colaborador eliminado correctamente.', 'success');
+                    cargarColaboradores();
+                }
+            } else {
+                showToast(data.detail || 'Ocurrió un error.', 'error');
+            }
+        }
+
+        // ==========================================
+        // ENTREGAS (con paginación y CSVs)
+        // ==========================================
+        async function cargarDatosEntrega() {
+            const res_c = await fetch(`/api/sucursal/colaboradores/${id_sucursal}`);
+            const colabs = await res_c.json();
+            const combo_c = document.getElementById('ent_combo_colab');
+            combo_c.innerHTML = '';
+            colaboradoresCache = {};
+            colabs.forEach(c => { 
+                colaboradoresCache[c.id_colaborador] = c; 
+                combo_c.innerHTML += `<option value="${c.id_colaborador}">${c.nombre} ${c.apellido}</option>`; 
+            });
+
+            const res_s = await fetch(`/api/sucursal/inventario-disponible/${id_sucursal}`);
+            const stock = await res_s.json();
+            const combo_s = document.getElementById('ent_combo_stock');
+            combo_s.innerHTML = '';
+            stock.forEach(s => { 
+                combo_s.innerHTML += `<option value="${s.id_producto}" data-talla="${s.talla}">${s.producto_catalogo?.nombre_item} [${s.talla}] - (${s.cantidad_disponible} disp)</option>`; 
+            });
+            actualizarVisorTallas();
+        }
+
+        function actualizarVisorTallas() {
+            const id = document.getElementById('ent_combo_colab').value;
+            const visor = document.getElementById('ent_visor_tallas');
+            if(id && colaboradoresCache[id]) {
+                const c = colaboradoresCache[id];
+                visor.innerText = `👕 Tallas del Colaborador — Superior: ${c.talla_superior} | Inferior: ${c.talla_inferior} | Calzado: N° ${c.talla_calzado || '0'}`;
+            } else {
+                visor.innerText = '👕 Selecciona un colaborador para ver sus tallas';
+            }
+        }
+
+        function añadirAColaEntrega() {
+            const comboColab = document.getElementById('ent_combo_colab');
+            const comboS = document.getElementById('ent_combo_stock');
+            
+            if (!comboColab.value) return showToast('Por favor, selecciona un colaborador primero.', 'warning');
+            if (!comboS.value) return showToast('Selecciona una prenda válida.', 'warning');
+            
+            if (colaEntrega.length === 0) {
+                comboColab.disabled = true;
+            }
+            
+            const selected = comboS.options[comboS.selectedIndex];
+            const cant = parseInt(document.getElementById('ent_cantidad').value);
+            
+            colaEntrega.push({
+                id_producto: comboS.value,
+                nombre_prenda: selected.text,
+                talla: selected.getAttribute('data-talla'),
+                cantidad: cant
+            });
+
+            document.getElementById('divColaEntrega').style.display = 'block';
+            renderColaEntrega();
+            showToast(`"${selected.text}" añadido a la lista de despacho.`, 'success');
+        }
+
+        function renderColaEntrega() {
+            const tbody = document.getElementById('colaEntregaBody');
+            tbody.innerHTML = '';
+            
+            colaEntrega.forEach((item, index) => {
+                tbody.innerHTML += `<tr>
+                    <td>${item.nombre_prenda}</td>
+                    <td>${item.talla}</td>
+                    <td>${item.cantidad}</td>
+                    <td><button type="button" onclick="removerItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="bi bi-x-lg"></i></button></td>
+                </tr>`;
+            });
+        }
+
+        function removerItem(index) {
+            colaEntrega.splice(index, 1);
+            renderColaEntrega();
+            
+            if (colaEntrega.length === 0) {
+                document.getElementById('ent_combo_colab').disabled = false;
+                document.getElementById('divColaEntrega').style.display = 'none';
+            }
+        }
+
+        async function confirmarEntregaMasiva() {
+            const id_colab = document.getElementById('ent_combo_colab').value;
+            
+            if (colaEntrega.length === 0) return showToast('La lista está vacía.', 'warning');
+            if (!id_colab) return showToast('Selecciona un colaborador.', 'warning');
+
+            const totalItems = colaEntrega.reduce((sum, item) => sum + item.cantidad, 0);
+            if (!await appConfirm(`¿Confirmas la entrega de ${totalItems} prenda(s)?`, { title: 'Confirmar entrega', confirmText: 'Entregar' })) return;
+
+            try {
+                const res = await fetch('/api/sucursal/entregas-masivas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_colaborador: parseInt(id_colab),
+                        items: colaEntrega,
+                        id_usuario_actual: id_usuario,
+                        id_sucursal: parseInt(id_sucursal)
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast('¡Entrega masiva registrada exitosamente!', 'success');
+                    colaEntrega = [];
+                    document.getElementById('ent_combo_colab').disabled = false;
+                    document.getElementById('divColaEntrega').style.display = 'none';
+                    renderColaEntrega();
+                    cargarHistorialEntregas();
+                } else {
+                    showToast(`Error: ${data.detail || 'No se pudo procesar'}`, 'error');
+                }
+            } catch (error) {
+                console.error("Error de red:", error);
+                showToast('No se pudo conectar con el servidor.', 'error');
+            }
+        }
+
+        // ==========================================
+        // HISTORIAL DE ENTREGAS CON CSV
+        // ==========================================
+        async function cargarHistorialEntregas() {
+            try {
+                const response = await fetch(`/api/sucursal/entregas-historial/${id_sucursal}`);
+                entregasHistorialCache = await response.json();
+                renderizarEntregas();
+            } catch (error) {
+                console.error('Error al cargar entregas:', error);
+                showToast('Error al cargar el historial de entregas', 'error');
+            }
+        }
+
+        function renderizarEntregas() {
+            const tbody = document.getElementById('tbodyEntregas');
+            tbody.innerHTML = '';
+            
+            if (entregasHistorialCache.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No hay entregas registradas.</td></tr>';
+                document.getElementById('inicioEntregas').textContent = 0;
+                document.getElementById('finEntregas').textContent = 0;
+                document.getElementById('totalEntregas').textContent = 0;
+                return;
+            }
+            
+            entregasHistorialCache.forEach((entrega, index) => {
+                const colab = entrega.colaborador || {};
+                const detalles = entrega.detalle_entrega || [];
+                
+                const detallesStr = detalles.map(d => {
+                    const prod = d.producto_catalogo || {};
+                    return `${prod.nombre_item || 'Producto'} [Talla ${d.talla}] (${d.cantidad})`;
+                }).join(', ');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="checkbox" class="entrega-checkbox" value="${entrega.id_entrega}" data-row="${index}"></td>
+                    <td>${new Date(entrega.fecha_entrega).toLocaleString()}</td>
+                    <td data-nombre="${colab.nombre || ''}" data-apellido="${colab.apellido || ''}" data-rut="${colab.rut || ''}">
+                        ${colab.nombre || ''} ${colab.apellido || ''}
+                    </td>
+                    <td>${detallesStr}</td>
+                    <td>${detalles.length > 0 ? detalles[0].talla : '-'}</td>
+                    <td>${detalles.reduce((sum, d) => sum + d.cantidad, 0)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('inicioEntregas').textContent = entregasHistorialCache.length > 0 ? 1 : 0;
+            document.getElementById('finEntregas').textContent = entregasHistorialCache.length;
+            document.getElementById('totalEntregas').textContent = entregasHistorialCache.length;
+            
+            // Event listeners para checkboxes
+            document.getElementById('selectAllEntregas').addEventListener('change', function() {
+                document.querySelectorAll('.entrega-checkbox').forEach(cb => {
+                    cb.checked = this.checked;
+                });
+                actualizarBotonDescarga();
+            });
+            
+            document.querySelectorAll('.entrega-checkbox').forEach(cb => {
+                cb.addEventListener('change', actualizarBotonDescarga);
+            });
+            
+            actualizarBotonDescarga();
+        }
+
+        function actualizarBotonDescarga() {
+            const checkboxes = document.querySelectorAll('.entrega-checkbox:checked');
+            document.getElementById('btnDescargarSeleccionados').disabled = checkboxes.length === 0;
+        }
+
+        // Descargar selección
+        document.getElementById('btnDescargarSeleccionados').addEventListener('click', async function() {
+            const checkboxes = document.querySelectorAll('.entrega-checkbox:checked');
+            const idsEntregas = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            
+            if (idsEntregas.length === 0) {
+                showToast('Seleccione al menos una entrega', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/sucursal/csv-entregas/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_entregas: idsEntregas,
+                        id_sucursal: parseInt(id_sucursal),
+                        id_usuario: id_usuario
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(`CSV generado exitosamente con folio: ${result.folio}`, 'success');
+                    window.location.href = `/api/sucursal/csv-entregas/descargar/${result.folio}`;
+                    cargarHistorialCSVGenerados();
+                    document.querySelectorAll('.entrega-checkbox').forEach(cb => cb.checked = false);
+                    document.getElementById('selectAllEntregas').checked = false;
+                    actualizarBotonDescarga();
+                } else {
+                    showToast(`Error: ${result.detail || result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al generar CSV:', error);
+                showToast('Error al generar CSV', 'error');
+            }
+        });
+
+        // Exportar todo
+        document.getElementById('btnExportarTodo').addEventListener('click', async function() {
+            if (entregasHistorialCache.length === 0) {
+                showToast('No hay entregas para exportar', 'warning');
+                return;
+            }
+            
+            const idsEntregas = entregasHistorialCache.map(e => e.id_entrega);
+            
+            try {
+                const response = await fetch('/api/sucursal/csv-entregas/generar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_entregas: idsEntregas,
+                        id_sucursal: parseInt(id_sucursal),
+                        id_usuario: id_usuario
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(`CSV generado exitosamente con folio: ${result.folio}`, 'success');
+                    window.location.href = `/api/sucursal/csv-entregas/descargar/${result.folio}`;
+                    cargarHistorialCSVGenerados();
+                } else {
+                    showToast(`Error: ${result.detail || result.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al exportar:', error);
+                showToast('Error al exportar', 'error');
+            }
+        });
+
+        // ==========================================
+        // CSVs GENERADOS
+        // ==========================================
+        async function cargarHistorialCSVGenerados() {
+            try {
+                const response = await fetch(`/api/sucursal/csv-entregas/historial/${id_sucursal}`);
+                const data = await response.json();
+                csvGeneradosData = data;
+                renderizarCSVGenerados();
+            } catch (error) {
+                console.error('Error al cargar CSVs generados:', error);
+                const tbody = document.getElementById('tbodyCsvGenerados');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Error al cargar CSVs generados</td></tr>';
+            }
+        }
+
+        function renderizarCSVGenerados() {
+            const tbody = document.getElementById('tbodyCsvGenerados');
+            tbody.innerHTML = '';
+            
+            if (!csvGeneradosData || csvGeneradosData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay CSVs generados</td></tr>';
+                return;
+            }
+            
+            csvGeneradosData.forEach(csv => {
+                const tr = document.createElement('tr');
+                // Manejar fechas correctamente
+                let fechaGen = csv.fecha_generacion || '';
+                let fechaExp = csv.fecha_expiracion || '';
+                
+                // Si son strings ISO, convertirlos a Date
+                try {
+                    const dGen = new Date(fechaGen);
+                    if (!isNaN(dGen)) fechaGen = dGen.toLocaleString();
+                } catch {}
+                
+                try {
+                    const dExp = new Date(fechaExp);
+                    if (!isNaN(dExp)) fechaExp = dExp.toLocaleDateString();
+                } catch {}
+                
+                tr.innerHTML = `
+                    <td><strong>${csv.folio}</strong></td>
+                    <td>${fechaGen}</td>
+                    <td><span class="badge info">${csv.cantidad_registros}</span></td>
+                    <td><span class="badge warning">${fechaExp}</span></td>
+                    <td style="display:flex; gap:6px; justify-content:center;">
+                        <button class="btn-action btn-csv" onclick="descargarCSV('${csv.folio}')" style="font-size:0.7rem; padding:4px 10px; height:auto; border-radius:6px;">
+                            📥 Descargar
+                        </button>
+                        <button class="btn-action btn-danger-custom" onclick="eliminarCSV('${csv.folio}')" style="font-size:0.7rem; padding:4px 10px; height:auto; border-radius:6px;">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.descargarCSV = function(folio) {
+            window.location.href = `/api/sucursal/csv-entregas/descargar/${folio}`;
+        };
+
+        window.eliminarCSV = async function(folio) {
+            if (!await appConfirm(`¿Está seguro de eliminar el CSV con folio ${folio}?`, { title: 'Eliminar CSV', danger: true, confirmText: 'Eliminar' })) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/sucursal/csv-entregas/eliminar/${folio}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('CSV eliminado correctamente', 'success');
+                    cargarHistorialCSVGenerados();
+                } else {
+                    showToast(`Error: ${result.detail}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error al eliminar CSV:', error);
+                showToast('Error al eliminar CSV', 'error');
+            }
+        };
+
+        // ==========================================
+        // STOCK CON VALORES MONETARIOS (sin cambios)
+        // ==========================================
+        async function cambiarDimensionStock(dimension) {
+            dimensionActiva = dimension;
+            const btnInv = document.getElementById('btnDimInventario');
+            const btnDot = document.getElementById('btnDimDotacion');
+            const btnMer = document.getElementById('btnDimMermas');
+            const lblTitulo = document.getElementById('lblTituloTablaStock');
+
+            [btnInv, btnDot, btnMer].forEach(b => {
+                b.style.opacity = '0.6';
+                b.style.backgroundColor = '#64748b';
+            });
+
+            if (dimension === 'inventario') {
+                btnInv.style.backgroundColor = 'var(--accent)'; btnInv.style.opacity = '1';
+                lblTitulo.innerText = "📦 Inventario Disponible en Estanterías de Sede";
+            } else if (dimension === 'dotacion') {
+                btnDot.style.backgroundColor = '#fbbf24'; btnDot.style.opacity = '1';
+                lblTitulo.innerText = "🟡 Indumentaria y Dotación en Uso por el Personal";
+            } else if (dimension === 'mermas') {
+                btnMer.style.backgroundColor = '#ff6b6b'; btnMer.style.opacity = '1';
+                lblTitulo.innerText = "🟢 Historial de Stock Mermado y de Baja";
+            }
+
+            document.getElementById('filtro_stock_nombre').value = '';
+            await cargarStockReal();
+        }
+
+        async function abrirModalStockManual() {
+            const combo = document.getElementById('manual_combo_prenda');
+            combo.innerHTML = '';
+            if(!window.catalogoCacheLocal) await cargarCatalogoFacturas();
+            window.catalogoCacheLocal.forEach(p => {
+                combo.innerHTML += `<option value="${p.id_producto}" data-talla="${p.talla}">${p.nombre_item} [${p.talla}]</option>`;
+            });
+            document.getElementById('modalStockManual').style.display = 'flex';
+        }
+
+        async function guardarStockManual() {
+            const combo = document.getElementById('manual_combo_prenda');
+            const cantidad = parseInt(document.getElementById('manual_cantidad').value);
+            if(!combo.value || !cantidad || cantidad <= 0) return showToast('Datos inválidos.', 'error');
+            
+            const selected = combo.options[combo.selectedIndex];
+            
+            const res = await fetch(`/api/sucursal/stock-manual/${id_sucursal}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_producto: parseInt(combo.value),
+                    talla: selected.getAttribute('data-talla'),
+                    cantidad: cantidad
+                })
+            });
+            
+            if(res.ok) {
+                showToast(`${cantidad} unidad(es) de "${selected.text}" ingresadas al stock.`, 'success');
+                document.getElementById('modalStockManual').style.display = 'none';
+                document.getElementById('manual_cantidad').value = '';
+                cargarStockReal(); 
+            } else {
+                const err = await res.json();
+                showToast(`Error al ingresar stock: ${err.detail}`, 'error');
+            }
+        }
+
+        async function cargarStockReal() {
+            if (dimensionActiva === 'inventario' || dimensionActiva === 'mermas') {
+                const res = await fetch(`/api/sucursal/inventario-completo/${id_sucursal}`);
+                const data = await res.json();
+                stockCacheGlobal = Array.isArray(data) ? data : []; // PREVENCIÓN CRASH
+            } else {
+                const res = await fetch(`/api/sucursal/dotacion-consolidada/${id_sucursal}`);
+                const data = await res.json();
+                cacheDotacionConsolidada = Array.isArray(data) ? data : []; // PREVENCIÓN CRASH
+            }
+            filtrarTablaStockLocal();
+        }
+
+        function filtrarTablaStockLocal() {
+            const tbody = document.getElementById('stockTableBody');
+            const legendContainer = document.getElementById('chartLegendContainer');
+            const thHeaders = document.getElementById('thStockHeaders');
+            const search = document.getElementById('filtro_stock_nombre').value.toLowerCase();
+            
+            tbody.innerHTML = '';
+            legendContainer.innerHTML = ''; 
+            let labels = []; 
+            let valores = [];
+            let paletaColores = [];
+            let totalValorGeneral = 0;
+            let totalUnidadesGeneral = 0;
+            let totalItems = 0;
+
+            const coloresPorDimension = {
+                'inventario': ['#0D3B82', '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA'], 
+                'dotacion': ['#FFC700', '#F59E0B', '#FBBF24', '#FCD34D', '#FDE68A'],   
+                'mermas': ['#F64E4E', '#DC2626', '#EF4444', '#F87171', '#FCA5A5']      
+            };
+
+            let datosAProcesar = (dimensionActiva === 'dotacion') ? cacheDotacionConsolidada : stockCacheGlobal;
+
+            if (datosAProcesar.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted)">Sin registros en esta dimensión.</td></tr>';
+                legendContainer.innerHTML = '<p style="text-align:center; font-size:0.85rem; color:var(--text-muted)">No hay datos disponibles</p>';
+                document.getElementById('valorTotalStock').textContent = '$0';
+                document.getElementById('totalUnidadesStock').textContent = '0 unidades';
+                document.getElementById('totalItemsStock').textContent = '0 ítems';
+                if(stockChartInstance) stockChartInstance.destroy();
+                return;
+            }
+
+            let colorIndex = 0;
+
+            if (dimensionActiva === 'dotacion') {
+                thHeaders.innerHTML = `<th>RUT</th><th>Colaborador / Cargo</th><th>Prendas en Uso</th><th>Valor Total</th><th style="text-align:right;">Detalles</th>`;
+                let agrupado = {};
+                let conteoGrafico = {};
+
+                datosAProcesar.forEach(st => {
+                    let nombre_prenda = st.producto_catalogo?.nombre_item || "Artículo Desconocido";
+                    let precio = parseFloat(st.producto_catalogo?.precio_unitario || 0);
+                    let nombreColab = `${st.colaborador?.nombre} ${st.colaborador?.apellido}`.toLowerCase();
+                    if (search && !nombre_prenda.toLowerCase().includes(search) && !nombreColab.includes(search)) return;
+
+                    const colabId = st.id_colaborador;
+                    if (!agrupado[colabId]) agrupado[colabId] = { 
+                        colaborador: st.colaborador, 
+                        prendas: [], 
+                        total: 0,
+                        valorTotal: 0 
+                    };
+                    
+                    agrupado[colabId].prendas.push(st);
+                    agrupado[colabId].total += st.cantidad_en_uso;
+                    agrupado[colabId].valorTotal += st.cantidad_en_uso * precio;
+
+                    let keyGrafico = `${nombre_prenda} [${st.talla}]`;
+                    if(!conteoGrafico[keyGrafico]) conteoGrafico[keyGrafico] = 0;
+                    conteoGrafico[keyGrafico] += st.cantidad_en_uso;
+                });
+
+                Object.values(agrupado).forEach(grupo => {
+                    const c = grupo.colaborador;
+                    totalValorGeneral += grupo.valorTotal;
+                    totalUnidadesGeneral += grupo.total;
+                    totalItems++;
+                    
+                    tbody.innerHTML += `
+                        <tr class="colab-row" onclick="toggleDetalleColab(${c.id_colaborador})">
+                            <td><strong>${c.rut}</strong></td>
+                            <td>
+                                <div style="font-weight:600;">${c.nombre} ${c.apellido}</div>
+                                <div style="font-size:0.7rem; color:var(--text-muted);">${c.tipo_personal}</div>
+                            </td>
+                            <td><span class="badge active" style="background:var(--accent); color:#fff;">${grupo.total} ítems</span></td>
+                            <td><strong style="color:var(--accent);">$${grupo.valorTotal.toLocaleString()}</strong></td>
+                            <td style="text-align:right; color:var(--text-secondary); font-size:1.1rem;"><i class="bi bi-chevron-down"></i></td>
+                        </tr>
+                    `;
+
+                    let prendasHTML = '';
+                    grupo.prendas.forEach(p => {
+                        let nombre_prenda = p.producto_catalogo?.nombre_item || "Artículo Desconocido";
+                        let precio = parseFloat(p.producto_catalogo?.precio_unitario || 0);
+                        let valorLinea = p.cantidad_en_uso * precio;
+                        let fecha = p.fecha_actualizacion ? p.fecha_actualizacion.split('T')[0] : '—';
+                        prendasHTML += `
+                            <tr>
+                                <td>${nombre_prenda}</td>
+                                <td><span class="badge active">${p.talla}</span></td>
+                                <td><strong>${p.cantidad_en_uso}</strong></td>
+                                <td>$${precio.toLocaleString()}</td>
+                                <td><strong style="color:var(--accent);">$${valorLinea.toLocaleString()}</strong></td>
+                                <td style="color:var(--text-muted); font-size:0.75rem;">${fecha}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tbody.innerHTML += `
+                        <tr id="detalle-colab-${c.id_colaborador}" class="detail-row">
+                            <td colspan="5" style="padding:0;">
+                                <div class="cortina-content">
+                                    <table class="detail-table">
+                                        <thead><tr><th>Prenda Asignada</th><th>Talla</th><th>Cant. Física</th><th>Valor Unit.</th><th>Valor Total</th><th>Última Modificación</th></tr></thead>
+                                        <tbody>${prendasHTML}</tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                Object.entries(conteoGrafico).forEach(([nombre, cant]) => {
+                    labels.push(nombre);
+                    valores.push(cant);
+                    let colorAsignado = coloresPorDimension['dotacion'][colorIndex % coloresPorDimension['dotacion'].length];
+                    paletaColores.push(colorAsignado);
+                    legendContainer.innerHTML += buildLegendItem(colorAsignado, nombre, cant);
+                    colorIndex++;
+                });
+
+            } else {
+                // Inventario y Mermas
+                thHeaders.innerHTML = `<th>ID</th><th>Producto / Descripción</th><th>Talla</th><th>Cantidad</th><th>Valor Unit.</th><th>Valor Total</th>`;
+                
+                datosAProcesar.forEach(st => {
+                    let nombre_prenda = st.producto_catalogo?.nombre_item || "Artículo Desconocido";
+                    let precio = parseFloat(st.producto_catalogo?.precio_unitario || 0);
+                    if(search && !nombre_prenda.toLowerCase().includes(search)) return;
+
+                    let cantidadMostrada = (dimensionActiva === 'inventario') ? st.cantidad_disponible : st.cantidad_merma;
+                    let valorLinea = cantidadMostrada * precio;
+                    let badgeClass = (dimensionActiva === 'inventario') ? 'active' : 'success';
+                    let estiloFilaCritica = (dimensionActiva === 'inventario' && cantidadMostrada <= 3) ? ' style="background-color: var(--danger-soft); border-left: 4px solid var(--danger);"' : ''; 
+
+                    if (cantidadMostrada > 0) {
+                        totalValorGeneral += valorLinea;
+                        totalUnidadesGeneral += cantidadMostrada;
+                        totalItems++;
+                    }
+
+                    tbody.innerHTML += `<tr${estiloFilaCritica}>
+                        <td><strong>#${st.id_producto}</strong></td>
+                        <td>${nombre_prenda}</td>
+                        <td><span class="badge ${badgeClass}">${st.talla}</span></td>
+                        <td><strong>${cantidadMostrada}</strong></td>
+                        <td>$${precio.toLocaleString()}</td>
+                        <td><strong style="color:var(--accent);">$${valorLinea.toLocaleString()}</strong></td>
+                    </tr>`;
+
+                    if (cantidadMostrada > 0) {
+                        let etiqueta = `${nombre_prenda} [${st.talla}]`;
+                        labels.push(etiqueta);
+                        valores.push(cantidadMostrada);
+                        let colorAsignado = coloresPorDimension[dimensionActiva][colorIndex % coloresPorDimension[dimensionActiva].length];
+                        paletaColores.push(colorAsignado);
+                        legendContainer.innerHTML += buildLegendItem(colorAsignado, etiqueta, cantidadMostrada);
+                        colorIndex++;
+                    }
+                });
+            }
+
+            // Actualizar totalizadores
+            document.getElementById('valorTotalStock').textContent = `$${totalValorGeneral.toLocaleString()}`;
+            document.getElementById('totalUnidadesStock').textContent = `${totalUnidadesGeneral} unidades`;
+            document.getElementById('totalItemsStock').textContent = `${totalItems} ítems`;
+
+            if(stockChartInstance) stockChartInstance.destroy();
+            if(valores.length === 0) {
+                legendContainer.innerHTML = '<p style="text-align:center; font-size:0.85rem; color:var(--text-muted)">Sin existencias activas</p>';
+                return;
+            }
+
+            const ctx = document.getElementById('stockChart').getContext('2d');
+            stockChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: valores, backgroundColor: paletaColores }] },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    cutout: '55%'
+                }
+            });
+        }
+
+        function buildLegendItem(color, nombre, cant) {
+            // Buscar el precio del producto en los datos
+            let precio = 0;
+            let datos = (dimensionActiva === 'dotacion') ? cacheDotacionConsolidada : stockCacheGlobal;
+            let item = datos.find(d => {
+                let nombreItem = d.producto_catalogo?.nombre_item || "Artículo Desconocido";
+                return `${nombreItem} [${d.talla}]` === nombre;
+            });
+            if (item) {
+                precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+            }
+            let valorTotal = cant * precio;
+            
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; padding:2px 4px;">
+                    <div style="display:flex; align-items:center; gap:6px; color:var(--text-secondary);">
+                        <span style="display:inline-block; width:10px; height:10px; background-color:${color}; border-radius:3px;"></span>
+                        <span>${nombre}</span>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <span style="color:var(--text-muted); font-size:0.7rem;">${cant} unds</span>
+                        <strong style="color:var(--accent);">$${valorTotal.toLocaleString()}</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleDetalleColab(id) {
+            const fila = document.getElementById(`detalle-colab-${id}`);
+            if (fila.classList.contains('open')) fila.classList.remove('open');
+            else fila.classList.add('open');
+        }
+
+        function exportarStockCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,ID Producto;Descripcion;Talla;Cantidad;Valor Unitario;Valor Total\n";
+            if (dimensionActiva === 'dotacion') {
+                cacheDotacionConsolidada.forEach(s => { 
+                    let precio = parseFloat(s.producto_catalogo?.precio_unitario || 0);
+                    let valor = s.cantidad_en_uso * precio;
+                    csvContent += `${s.id_producto};${s.producto_catalogo?.nombre_item};${s.talla};${s.cantidad_en_uso};$${precio.toLocaleString()};$${valor.toLocaleString()}\n`; 
+                });
+            } else {
+                stockCacheGlobal.forEach(s => { 
+                    let cant = (dimensionActiva === 'inventario') ? s.cantidad_disponible : s.cantidad_merma;
+                    let precio = parseFloat(s.producto_catalogo?.precio_unitario || 0);
+                    let valor = cant * precio;
+                    csvContent += `${s.id_producto};${s.producto_catalogo?.nombre_item};${s.talla};${cant};$${precio.toLocaleString()};$${valor.toLocaleString()}\n`; 
+                });
+            }
+            downloadCSV(csvContent, `Reporte_Stock_${dimensionActiva}_Sede_${id_sucursal}.csv`);
+            showToast('CSV exportado correctamente.', 'success');
+        }
+
+        async function exportarStockConsolidadoMaestroCSV() {
+            try {
+                const [resInv, resDot, resFac] = await Promise.all([
+                    fetch(`/api/sucursal/inventario-completo/${id_sucursal}`),
+                    fetch(`/api/sucursal/dotacion-consolidada/${id_sucursal}`),
+                    fetch(`/api/sucursal/facturas-historial/${id_sucursal}`)
+                ]);
+
+                const invData = await resInv.json();
+                const dotData = await resDot.json();
+                const facData = await resFac.json();
+
+                let matrizAuditoria = {};
+
+                invData.forEach(item => {
+                    let key = `${item.id_producto}-${item.talla}`;
+                    let precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+                    matrizAuditoria[key] = {
+                        id_producto: item.id_producto,
+                        descripcion: item.producto_catalogo?.nombre_item || "Artículo",
+                        talla: item.talla,
+                        inventario: item.cantidad_disponible || 0,
+                        dotacion: 0,
+                        merma: item.cantidad_merma || 0,
+                        facturado: 0,
+                        precio_unitario: precio,
+                        valor_inventario: (item.cantidad_disponible || 0) * precio,
+                        valor_merma: (item.cantidad_merma || 0) * precio
+                    };
+                });
+
+                dotData.forEach(item => {
+                    let key = `${item.id_producto}-${item.talla}`;
+                    let precio = parseFloat(item.producto_catalogo?.precio_unitario || 0);
+                    if (!matrizAuditoria[key]) {
+                        matrizAuditoria[key] = {
+                            id_producto: item.id_producto,
+                            descripcion: item.producto_catalogo?.nombre_item || "Artículo",
+                            talla: item.talla,
+                            inventario: 0, dotacion: 0, merma: 0, facturado: 0,
+                            precio_unitario: precio,
+                            valor_inventario: 0,
+                            valor_merma: 0
+                        };
+                    }
+                    matrizAuditoria[key].dotacion += item.cantidad_en_uso || 0;
+                });
+
+                facData.forEach(factura => {
+                    if (factura.detalle_factura) {
+                        factura.detalle_factura.forEach(d => {
+                            let key = `${d.id_producto}-${d.talla}`;
+                            let precio = parseFloat(d.producto_catalogo?.precio_unitario || 0);
+                            if (!matrizAuditoria[key]) {
+                                matrizAuditoria[key] = {
+                                    id_producto: d.id_producto,
+                                    descripcion: d.producto_catalogo?.nombre_item || "Artículo",
+                                    talla: d.talla,
+                                    inventario: 0, dotacion: 0, merma: 0, facturado: 0,
+                                    precio_unitario: precio,
+                                    valor_inventario: 0,
+                                    valor_merma: 0
+                                };
+                            }
+                            matrizAuditoria[key].facturado += d.cantidad || 0;
+                        });
+                    }
+                });
+
+                let csvRows = [];
+                let csvHeader = "CINÉPOLIS SGI — REPORTES DE AUDITORÍA LOGÍSTICA MAESTRA\n";
+                csvHeader += `Sucursal Operando:;${nombre_sucursal};(ID Sede:;${id_sucursal})\n`;
+                csvHeader += `Fecha y Hora de Emisión:;${new Date().toLocaleString()}\n\n`;
+                csvHeader += "ID Producto;Descripción;Talla;Precio Unit.;Stock Libre;Valor Stock;Dotación;Valor Dotación;Merma;Valor Merma;Total Físico;Valor Total Físico;Facturado;Diferencia\n";
+                
+                csvRows.push(csvHeader);
+
+                let totalValorFisico = 0;
+                let totalValorFacturado = 0;
+
+                Object.values(matrizAuditoria).forEach(row => {
+                    let sumaTotalFisico = row.inventario + row.dotacion + row.merma;
+                    let valorTotalFisico = sumaTotalFisico * row.precio_unitario;
+                    let valorFacturado = row.facturado * row.precio_unitario;
+                    let diferencia = sumaTotalFisico - row.facturado;
+                    
+                    totalValorFisico += valorTotalFisico;
+                    totalValorFacturado += valorFacturado;
+                    
+                    csvRows.push(`${row.id_producto};${row.descripcion};${row.talla};$${row.precio_unitario.toLocaleString()};${row.inventario};$${row.valor_inventario.toLocaleString()};${row.dotacion};$${(row.dotacion * row.precio_unitario).toLocaleString()};${row.merma};$${row.valor_merma.toLocaleString()};${sumaTotalFisico};$${valorTotalFisico.toLocaleString()};${row.facturado};${diferencia}\n`);
+                });
+
+                csvRows.push(`\n\nTOTAL GENERAL;VALOR FÍSICO:;$${totalValorFisico.toLocaleString()};VALOR FACTURADO:;$${totalValorFacturado.toLocaleString()}\n`);
+
+                const blob = new Blob(["\uFEFF" + csvRows.join("")], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute("href", url);
+                link.setAttribute("download", `Auditoria_Maestra_Consolidada_Sede_${id_sucursal}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('Reporte consolidado exportado correctamente.', 'success');
+                
+            } catch (error) {
+                showToast(`Error crítico al consolidar balance: ${error.message}`, 'error');
+            }
+        }
+
+        // ==========================================
+        // STOCK OUT
+        // ==========================================
+        async function alternarOrigenStockOut() {
+            const origen = document.getElementById('out_origen').value;
+            const boxColab = document.getElementById('out_box_colab');
+            const comboMotivo = document.getElementById('out_tipo_salida');
+
+            if(origen === 'inventario') {
+                boxColab.style.display = 'none';
+                comboMotivo.innerHTML = '<option>Merma por desgaste</option><option>Extravio</option>';
+                
+                const res = await fetch(`/api/sucursal/inventario-completo/${id_sucursal}`);
+                const data = await res.json();
+                const comboP = document.getElementById('out_combo_prenda');
+                comboP.innerHTML = '';
+                data.forEach(s => {
+                    comboP.innerHTML += `<option value="${s.id_producto}" data-talla="${s.talla}">${s.producto_catalogo?.nombre_item} [${s.talla}] (Dispo: ${s.cantidad_disponible})</option>`;
+                });
+            } else {
+                boxColab.style.display = 'block';
+                comboMotivo.innerHTML = '<option>Devolucion conforme a Stock</option><option>Renuncia sin devolucion</option>';
+                
+                const res_c = await fetch(`/api/sucursal/colaboradores/${id_sucursal}`);
+                const colabs = await res_c.json();
+                const combo_c = document.getElementById('out_combo_colab');
+                combo_c.innerHTML = '';
+                colabs.forEach(c => { combo_c.innerHTML += `<option value="${c.id_colaborador}">${c.nombre} ${c.apellido}</option>`; });
+                cargarPrendasStockOut();
+            }
+        }
+
+        async function cargarPrendasStockOut() {
+            const origen = document.getElementById('out_origen').value;
+            if(origen !== 'dotacion') return;
+            const id_colab = document.getElementById('out_combo_colab').value;
+            if(!id_colab) return;
+
+            const res = await fetch(`/api/sucursal/dotacion-colaborador/${id_colab}`);
+            const data = await res.json();
+            const comboP = document.getElementById('out_combo_prenda');
+            comboP.innerHTML = '';
+            if(data.length === 0) {
+                comboP.innerHTML = '<option value="">Sin prendas en uso</option>';
+                return;
+            }
+            data.forEach(d => {
+                comboP.innerHTML += `<option value="${d.id_producto}" data-talla="${d.talla}">${d.producto_catalogo?.nombre_item} [${d.talla}] (En Uso: ${d.cantidad_en_uso})</option>`;
+            });
+        }
+
+        async function confirmarStockOut() {
+            const origen = document.getElementById('out_origen').value;
+            const id_colab = document.getElementById('out_combo_colab').value;
+            const tipo_salida = document.getElementById('out_tipo_salida').value;
+            const comboP = document.getElementById('out_combo_prenda');
+            if(!comboP.value) return showToast('No hay una prenda válida seleccionada.', 'warning');
+            const selected = comboP.options[comboP.selectedIndex];
+            const cantidad = parseInt(document.getElementById('out_cantidad').value);
+            const nombrePrenda = selected.text || 'prenda';
+
+            if(!cantidad || cantidad <= 0) return showToast('Ingresa una cantidad válida.', 'warning');
+
+            if (!await appConfirm(
+                `¿Estás seguro de que deseas DAR DE BAJA ${cantidad} unidades de "${nombrePrenda}"?\n\n` +
+                `Origen: ${origen === 'inventario' ? 'Inventario Sede' : 'Dotación Colaborador'}\n` +
+                `Motivo: ${tipo_salida}\n` +
+                `Esta acción no se puede deshacer.`,
+                { title: 'Dar de baja stock', danger: true, confirmText: 'Dar de baja' }
+            )) return;
+
+            const res = await fetch(`/api/sucursal/stock-out/${id_sucursal}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    origen: origen,
+                    id_colaborador: origen === 'dotacion' ? parseInt(id_colab) : null,
+                    tipo_salida: tipo_salida,
+                    id_producto: parseInt(comboP.value),
+                    talla: selected.getAttribute('data-talla'),
+                    cantidad: cantidad
+                })
+            });
+
+            if(res.ok) {
+                showToast(`${cantidad} unidad(es) de "${nombrePrenda}" dadas de baja correctamente.`, 'success');
+                document.getElementById('out_cantidad').value = '';
+                cargarStockReal();
+            } else {
+                const err = await res.json();
+                showToast(`Error en Stock Out: ${err.detail}`, 'error');
+            }
+        }
+
+        // ==========================================
+        // SOLICITUDES DE ANULACIÓN (con paginación)
+        // ==========================================
+        async function cargarComboFacturasParaAnulacion() {
+            try {
+                const res = await fetch(`/api/sucursal/facturas-historial/${id_sucursal}`);
+                const facturas = await res.json();
+                const combo = document.getElementById('adm_combo_facturas');
+                combo.innerHTML = '<option value="">-- Selecciona Folio de Compra --</option>';
+                
+                if (facturas.length === 0) {
+                    combo.innerHTML = '<option value="">No hay facturas cargadas en la sede</option>';
+                    return;
+                }
+
+                facturas.forEach(f => {
+                    combo.innerHTML += `<option value="${f.id_factura}">Factura Folio #${f.correlativo_factura} (${f.nombre_proveedor} - ${f.fecha_ingreso.split('T')[0]})</option>`;
+                });
+            } catch (error) {
+                console.log("Error al poblar combo ADM: " + error.message);
+            }
+        }
+
+        async function enviarSolicitudAnulacionAdmin() {
+            const idFacturaSeleccionada = document.getElementById('adm_combo_facturas').value;
+            const motivoTexto = document.getElementById('adm_motivo_anulacion').value;
+
+            if (!idFacturaSeleccionada || !motivoTexto.trim()) {
+                return showToast('Por favor, selecciona una factura e ingresa una justificación.', 'warning');
+            }
+
+            if (!await appConfirm(
+                `¿Estás seguro de que deseas enviar una solicitud de ANULACIÓN?\n\n` +
+                `Factura: ${document.getElementById('adm_combo_facturas').options[document.getElementById('adm_combo_facturas').selectedIndex].text}\n` +
+                `Motivo: ${motivoTexto}`,
+                { title: 'Enviar solicitud de anulación', confirmText: 'Enviar' }
+            )) return;
+
+            try {
+                const res = await fetch('/api/sucursal/solicitar-anulacion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_sucursal: parseInt(id_sucursal),
+                        id_factura: parseInt(idFacturaSeleccionada),
+                        motivo: motivoTexto,
+                        id_usuario_solicita: id_usuario
+                    })
+                });
+
+                if (res.ok) {
+                    showToast('Solicitud enviada correctamente.', 'success');
+                    document.getElementById('adm_motivo_anulacion').value = '';
+                    document.getElementById('adm_combo_facturas').value = '';
+                    renderHistorialSolicitudesSede();
+                } else {
+                    const err = await res.json();
+                    showToast(`Fallo en registro: ${err.detail}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Fallo crítico de red: ${error.message}`, 'error');
+            }
+        }
+
+        async function renderHistorialSolicitudesSede() {
+            try {
+                const res = await fetch(`/api/sucursal/${id_sucursal}/solicitudes-anulacion`);
+                solicitudesHistorialCache = await res.json();
+                filtrarHistorialSolicitudes();
+            } catch (error) {
+                const tbody = document.getElementById('tbody_historial_solicitudes');
+                if (tbody) tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger);">Error al sincronizar bitácora: ${error.message}</td></tr>`;
+            }
+        }
+
+        function filtrarHistorialSolicitudes() {
+            const filtroProv = document.getElementById('filtro_sol_proveedor').value.toLowerCase();
+            const filtroCorr = document.getElementById('filtro_sol_correlativo').value;
+
+            let dataFiltrada = solicitudesHistorialCache.filter(sol => {
+                const cumpleProveedor = !filtroProv || (sol.nombre_proveedor && sol.nombre_proveedor.toLowerCase().includes(filtroProv));
+                const correlativoReal = sol.factura_ingreso?.correlativo_factura ? sol.factura_ingreso.correlativo_factura.toString() : '';
+                const cumpleCorrelativo = !filtroCorr || correlativoReal.includes(filtroCorr);
+                return cumpleProveedor && cumpleCorrelativo;
+            });
+            
+            renderizarTablaSolicitudes(dataFiltrada, 1);
+        }
+
+        function renderizarTablaSolicitudes(data, page) {
+            const tbody = document.getElementById('tbody_historial_solicitudes');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No se encontraron tickets con los filtros aplicados.</td></tr>';
+                document.getElementById('paginationSolicitudes').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('paginationSolicitudes').style.display = 'flex';
+            const { start, end } = renderPagination(data, 'paginationSolicitudes', 'solicitudes', page);
+            
+            for (let i = start; i < end; i++) {
+                const sol = data[i];
+                let badgeStyle = 'background-color: var(--border); color: var(--text-secondary);';
+                if (sol.estado === 'APROBADA') badgeStyle = 'background-color: var(--success-soft); color: var(--success); font-weight:bold;';
+                if (sol.estado === 'RECHAZADA') badgeStyle = 'background-color: var(--danger-soft); color: var(--danger); font-weight:bold;';
+
+                const fecha = sol.fecha_solicitud ? sol.fecha_solicitud.split('T')[0] : '—';
+                const observaciones = sol.observacion_resolucion ? sol.observacion_resolucion : '<em>En revisión por Jefatura...</em>';
+                const correlativoMostrar = sol.factura_ingreso?.correlativo_factura ? sol.factura_ingreso.correlativo_factura : '—';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>#${sol.id_solicitud}</strong></td>
+                        <td><span class="badge active" style="background-color:var(--accent-soft); color:var(--accent);">ID: ${sol.id_factura}</span></td>
+                        <td><strong style="color:var(--text-primary);">#${correlativoMostrar}</strong></td>
+                        <td>
+                            <div style="font-weight:600; font-size:0.9rem;">${sol.nombre_proveedor}</div>
+                            <div style="font-size:0.7rem; opacity:0.6;">${sol.rut_proveedor}</div>
+                        </td>
+                        <td>${fecha}</td>
+                        <td style="text-align:center;"><span class="badge" style="${badgeStyle}">${sol.estado}</span></td>
+                        <td style="white-space:normal; line-height:1.4; color:var(--text-secondary); font-size:0.85rem;">${observaciones}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ==========================================
+        // TRANSFERENCIAS (con paginación)
+        // ==========================================
+        async function toggleTransferencia(modo) {
+            modoTransferencia = modo;
+            const bStock = document.getElementById('btnTransfStock');
+            const bColab = document.getElementById('btnTransfColab');
+            
+            if(modo === 'stock') {
+                bStock.style.backgroundColor = 'var(--accent)'; bStock.style.opacity = '1';
+                bColab.style.backgroundColor = '#64748b'; bColab.style.opacity = '0.6';
+                document.getElementById('form-transf-stock').style.display = 'block';
+                document.getElementById('form-transf-colab').style.display = 'none';
+                await cargarPrendasParaTransferir();
+            } else {
+                bColab.style.backgroundColor = 'var(--accent)'; bColab.style.opacity = '1';
+                bStock.style.backgroundColor = '#64748b'; bStock.style.opacity = '0.6';
+                document.getElementById('form-transf-colab').style.display = 'block';
+                document.getElementById('form-transf-stock').style.display = 'none';
+                await cargarColaboradoresParaTransferir();
+            }
+        }
+
+        async function cargarSedesDestino() {
+            try {
+                const res = await fetch('/api/sucursales-listado');
+                const sedes = await res.json();
+                document.querySelectorAll('.combo_sedes_destino').forEach(select => {
+                    select.innerHTML = '<option value="">-- Seleccione Destino --</option>';
+                    // Filtrar: excluir sede actual, "Administrador Principal" y sedes sin nombre
+                    const sedesFiltradas = sedes.filter(s => 
+                        s.id_suc != parseInt(id_sucursal) && 
+                        s.nombre_suc && 
+                        s.nombre_suc.trim() !== '' && 
+                        s.nombre_suc !== 'Administrador Principal'
+                    );
+                    
+                    if (sedesFiltradas.length === 0) {
+                        select.innerHTML = '<option value="">No hay sedes disponibles</option>';
+                    } else {
+                        sedesFiltradas.forEach(s => {
+                            select.innerHTML += `<option value="${s.id_suc}">${s.nombre_suc}</option>`;
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error("Error cargando sedes:", error);
+                showToast("Error al cargar las sedes destino", "error");
+            }
+        }
+
+        async function cargarPrendasParaTransferir() {
+            try {
+                const res = await fetch(`/api/sucursal/inventario-disponible/${id_sucursal}`);
+                const data = await res.json();
+                const combo = document.getElementById('transf_stock_prenda');
+                combo.innerHTML = '';
+                if (data.length === 0) {
+                    combo.innerHTML = '<option value="">No hay stock disponible para transferir</option>';
+                    return;
+                }
+                data.forEach(s => {
+                    let precio = parseFloat(s.producto_catalogo?.precio_unitario || 0);
+                    combo.innerHTML += `<option value="${s.id_producto}" data-talla="${s.talla}">${s.producto_catalogo?.nombre_item || 'Artículo'} [${s.talla}] (Max: ${s.cantidad_disponible}) - $${precio.toLocaleString()}</option>`;
+                });
+            } catch (error) {
+                console.error("Error cargando prendas:", error);
+            }
+        }
+
+        async function cargarColaboradoresParaTransferir() {
+            try {
+                const res = await fetch(`/api/sucursal/colaboradores/${id_sucursal}`);
+                const data = await res.json();
+                const combo = document.getElementById('transf_colab_persona');
+                combo.innerHTML = '';
+                if (data.length === 0) {
+                    combo.innerHTML = '<option value="">No hay colaboradores en esta sede</option>';
+                    return;
+                }
+                data.forEach(c => {
+                    combo.innerHTML += `<option value="${c.id_colaborador}">${c.nombre} ${c.apellido} (${c.rut})</option>`;
+                });
+            } catch (error) {
+                console.error("Error cargando colaboradores:", error);
+            }
+        }
+
+        async function enviarSolicitudTransferencia(tipo) {
+            let payload = { id_sucursal_origen: parseInt(id_sucursal), id_usuario_solicita: id_usuario };
+            let endpoint = "";
+
+            if (tipo === 'stock') {
+                const cPrenda = document.getElementById('transf_stock_prenda');
+                const destino = document.getElementById('transf_stock_destino');
+                if(!cPrenda.value || !destino.value) return showToast('Completa todos los datos de stock.', 'warning');
+                
+                const cantidad = parseInt(document.getElementById('transf_stock_cant').value);
+                if(!cantidad || cantidad <= 0) return showToast('Ingresa una cantidad válida.', 'warning');
+                
+                payload.id_producto = parseInt(cPrenda.value);
+                payload.talla = cPrenda.options[cPrenda.selectedIndex].getAttribute('data-talla');
+                payload.cantidad = cantidad;
+                payload.id_sucursal_destino = parseInt(destino.value);
+                payload.motivo = document.getElementById('transf_stock_motivo').value || "Sin motivo especificado";
+                endpoint = "/api/sucursal/solicitar-transferencia-stock";
+            } else {
+                const cPersona = document.getElementById('transf_colab_persona');
+                const destino = document.getElementById('transf_colab_destino');
+                if(!cPersona.value || !destino.value) return showToast('Completa todos los datos del colaborador.', 'warning');
+                
+                payload.id_colaborador = parseInt(cPersona.value);
+                payload.id_sucursal_destino = parseInt(destino.value);
+                payload.motivo = document.getElementById('transf_colab_motivo').value || "Sin motivo especificado";
+                endpoint = "/api/sucursal/solicitar-transferencia-colaborador";
+            }
+
+            try {
+                const res = await fetch(endpoint, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if(res.ok) {
+                    showToast('Solicitud de transferencia enviada a Administración.', 'success');
+                    if (tipo === 'stock') {
+                        document.getElementById('transf_stock_cant').value = '';
+                        document.getElementById('transf_stock_motivo').value = '';
+                    } else {
+                        document.getElementById('transf_colab_motivo').value = '';
+                    }
+                    cargarHistorialTransferencias();
+                } else {
+                    const err = await res.json(); 
+                    showToast(`Error: ${err.detail || err.message || 'No se pudo procesar'}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Error de red: ${error.message}`, 'error');
+            }
+        }
+
+        async function cargarHistorialTransferencias() {
+            try {
+                const res = await fetch(`/api/transferencias/historial/${id_sucursal}`);
+                const data = await res.json();
+                
+                let unificadas = [];
+                
+                if (data.stock && Array.isArray(data.stock)) {
+                    data.stock.forEach(s => {
+                        unificadas.push({
+                            ...s,
+                            tipo_visual: '<i class="bi bi-box-seam"></i> Stock',
+                            desc: `${s.producto_catalogo?.nombre_item || 'Artículo'} [${s.talla}] x${s.cantidad}`
+                        });
+                    });
+                }
+                
+                if (data.colaboradores && Array.isArray(data.colaboradores)) {
+                    data.colaboradores.forEach(c => {
+                        unificadas.push({
+                            ...c,
+                            tipo_visual: '<i class="bi bi-people"></i> Colaborador',
+                            desc: `${c.colaborador?.nombre || ''} ${c.colaborador?.apellido || ''}`.trim() || 'Sin nombre'
+                        });
+                    });
+                }
+                
+                transferenciasHistorialCache = unificadas;
+                renderizarTablaTransferencias(unificadas, 1);
+                
+            } catch (error) {
+                console.error("Error cargando historial de transferencias:", error);
+                const tbody = document.getElementById('historialTransferenciasBody');
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--danger);">Error al cargar el historial.</td></tr>';
+                document.getElementById('paginationTransferencias').style.display = 'none';
+            }
+        }
+
+        function renderizarTablaTransferencias(data, page) {
+            const tbody = document.getElementById('historialTransferenciasBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted)">No hay solicitudes de transferencia registradas.</td></tr>';
+                document.getElementById('paginationTransferencias').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('paginationTransferencias').style.display = 'flex';
+            const { start, end } = renderPagination(data, 'paginationTransferencias', 'transferencias', page);
+            
+            for (let i = start; i < end; i++) {
+                const s = data[i];
+                let badgeClass = 'pending';
+                if (s.estado === 'APROBADA') badgeClass = 'success';
+                else if (s.estado === 'RECHAZADA') badgeClass = 'inactive';
+                
+                tbody.innerHTML += `<tr>
+                    <td><strong>#${s.id_solicitud || 'N/A'}</strong></td>
+                    <td><strong>${s.tipo_visual || '—'}</strong></td>
+                    <td>${s.desc || '—'}</td>
+                    <td>${s.sucursal_usuaria?.nombre_suc || s.sucursal_destino?.nombre_suc || '—'}</td>
+                    <td>${s.fecha_solicitud ? s.fecha_solicitud.split('T')[0] : '—'}</td>
+                    <td><span class="badge ${badgeClass}">${s.estado || 'PENDIENTE'}</span></td>
+                </tr>`;
+            }
+        }
+
+        // ==========================================
+        // RECEPCIÓN DE TRANSFERENCIAS (LOTES)
+        // ==========================================
+        async function cargarLotesRecepcion() {
+            try {
+                const res = await fetch(`/api/sucursal/lotes-transferencia/${id_sucursal}`);
+                lotesRecepcionCache = await res.json();
+
+                const pendientes = lotesRecepcionCache.filter(l => l.estado === 'EN_TRANSITO');
+                const resueltos = lotesRecepcionCache.filter(l => l.estado !== 'EN_TRANSITO');
+
+                const badge = document.getElementById('badge-recepcion');
+                if (pendientes.length > 0) { badge.innerText = pendientes.length; badge.style.display = 'inline-block'; }
+                else { badge.style.display = 'none'; }
+
+                renderizarPendientesLotes(pendientes);
+                renderizarTablaLotesHistorial(resueltos, 1);
+            } catch (error) {
+                console.error("Error cargando lotes de recepción:", error);
+            }
+        }
+
+        function renderizarPendientesLotes(pendientes) {
+            const tbody = document.getElementById('lotesPendientesBody');
+            tbody.innerHTML = '';
+
+            if (pendientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No hay lotes pendientes de confirmación.</td></tr>';
+                return;
+            }
+
+            pendientes.forEach(lote => {
+                const items = (lote.transferencia_lote_detalle || []).map(d => `${d.producto_catalogo?.nombre_item || 'Item'} [${d.talla}] (${d.cantidad})`).join(', ');
+                tbody.innerHTML += `<tr>
+                    <td>#${lote.id_lote}</td>
+                    <td>${lote.origen?.nombre_suc || '-'}</td>
+                    <td style="font-size:0.8rem; color:var(--text-muted)">${items}</td>
+                    <td>${lote.motivo || '-'}</td>
+                    <td>${lote.fecha_envio.split('T')[0]}</td>
+                    <td style="text-align:center; white-space:nowrap;">
+                        <button class="btn-action" style="background:#22C55E; padding:6px 12px; height:auto;" onclick="confirmarLote(${lote.id_lote})"><i class="bi bi-check-lg"></i> Confirmar</button>
+                        <button class="btn-action" style="background:var(--danger); padding:6px 12px; height:auto;" onclick="rechazarLote(${lote.id_lote})"><i class="bi bi-x-lg"></i> Rechazar</button>
+                    </td>
+                </tr>`;
+            });
+        }
+
+        async function confirmarLote(idLote) {
+            try {
+                const res = await fetch(`/api/sucursal/lote-transferencia/${idLote}/resolver`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: 'RECIBIDO', id_usuario_recibe: id_usuario })
+                });
+                if (res.ok) {
+                    showToast('Lote confirmado y cargado al inventario.', 'success');
+                    cargarLotesRecepcion();
+                } else {
+                    const err = await res.json();
+                    showToast(`Error: ${err.detail || 'No se pudo confirmar el lote.'}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Error de red: ${error.message}`, 'error');
+            }
+        }
+
+        async function rechazarLote(idLote) {
+            const observacion = await appPrompt('Describe el problema con este lote (faltante, dañado, etc.):', { title: 'Rechazar lote', placeholder: 'Ej: Llegaron solo 3 de las 10 unidades', confirmText: 'Rechazar' });
+            if (!observacion || !observacion.trim()) return showToast('Debes indicar una observación para rechazar el lote.', 'warning');
+
+            try {
+                const res = await fetch(`/api/sucursal/lote-transferencia/${idLote}/resolver`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: 'RECHAZADO', id_usuario_recibe: id_usuario, observacion_resolucion: observacion })
+                });
+                if (res.ok) {
+                    showToast('Lote rechazado. El stock volvió al origen.', 'success');
+                    cargarLotesRecepcion();
+                } else {
+                    const err = await res.json();
+                    showToast(`Error: ${err.detail || 'No se pudo rechazar el lote.'}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Error de red: ${error.message}`, 'error');
+            }
+        }
+
+        function renderizarTablaLotesHistorial(data, page) {
+            const tbody = document.getElementById('lotesHistorialBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Sin lotes resueltos todavía.</td></tr>';
+                document.getElementById('paginationLotesHistorial').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('paginationLotesHistorial').style.display = 'flex';
+            const { start, end } = renderPagination(data, 'paginationLotesHistorial', 'lotesHistorial', page);
+
+            for (let i = start; i < end; i++) {
+                const lote = data[i];
+                const items = (lote.transferencia_lote_detalle || []).map(d => `${d.producto_catalogo?.nombre_item || 'Item'} [${d.talla}] (${d.cantidad})`).join(', ');
+                const badgeClass = lote.estado === 'RECIBIDO' ? 'success' : 'inactive';
+                tbody.innerHTML += `<tr>
+                    <td>#${lote.id_lote}</td>
+                    <td>${lote.origen?.nombre_suc || '-'}</td>
+                    <td style="font-size:0.8rem; color:var(--text-muted)">${items}</td>
+                    <td><span class="badge ${badgeClass}">${lote.estado}</span></td>
+                    <td>${lote.fecha_resolucion ? lote.fecha_resolucion.split('T')[0] : '-'}</td>
+                    <td style="font-size:0.8rem;">${lote.observacion_resolucion || '-'}</td>
+                </tr>`;
+            }
+        }
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        function downloadCSV(content, filename) {
+            const encodedUri = encodeURI(content);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            const idSuc = localStorage.getItem('id_suc');
+            if (!idSuc) {
+                window.location.href = '/'; 
+                return;
+            }
+            switchView('home', document.querySelector('.nav-item.active'));
+            cargarLotesRecepcion();
+        });
+    </script>
+</body>
+</html>

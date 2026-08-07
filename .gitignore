@@ -1,0 +1,23 @@
+# Configuración local de Claude Code (no es código del proyecto)
+.claude/
+
+# Secretos - NUNCA subir esto a Git/GitHub
+.env
+
+# Entorno virtual de Python (se regenera con: pip install -r requirements.txt)
+.venv/
+
+# Cache de Python
+__pycache__/
+*.pyc
+
+# Logs de la app en producción
+logs/*.log
+
+# Archivos generados en tiempo de ejecución (no son código fuente)
+csv_generados/*.csv
+freblogs/
+
+# Archivos temporales de Windows/editor
+*.tmp
+Thumbs.db
