@@ -1,21 +1,52 @@
 === INSTALACION EN UN PC NUEVO ===
 
-1) Clonar/copiar el proyecto (sin .venv, se recrea abajo)
-   git clone <url-del-repo>
-   cd <carpeta-del-proyecto>
+0) Verificar requisitos antes de clonar (pegar en PowerShell)
+   Write-Output "--- Git ---"; git --version
+   Write-Output "--- Credential helper ---"; git config --global --get credential.helper
+   Write-Output "--- Python ---"; python --version
+   Write-Output "--- pip ---"; python -m pip --version
+   Write-Output "--- VS Code ---"; code --version
 
-2) Copiar el archivo .env a la raiz del proyecto (NO viene en git, hay que llevarlo aparte)
+   Que debe dar cada uno:
+   - Git: cualquier version reciente instalada
+   - Credential helper: debe decir "manager". Si sale vacio -> git config --global credential.helper manager
+   - Python: 3.14.x, instalado desde python.org (NO la version de Microsoft Store).
+     Si "python --version" muestra 3.13 o la ruta incluye "WindowsApps", desinstalar esa
+     version (Configuracion > Aplicaciones) e instalar la oficial desde python.org,
+     marcando la casilla "Add python.exe to PATH" en el instalador.
+   - pip: debe responder version (se usa "python -m pip" por si el comando suelto "pip"
+     no esta en el PATH; dentro del venv activado esto no es problema)
+   - VS Code: version instalada. Si "code" no se reconoce, faltó agregarlo al PATH al instalar.
+
+1) Clonar el proyecto
+   git clone https://github.com/Gio-script/GestionyDistribucionPT.git
+   cd GestionyDistribucionPT
+
+   La primera vez que git pida autenticarse va a abrir el navegador para loguearse en
+   GitHub (Git Credential Manager). No hay token pegado en la URL del remoto (se
+   removio por seguridad, estaba expuesto en texto plano en .git/config).
+
+2) Copiar el archivo .env a la raiz del proyecto clonado (NO viene en git, hay que
+   llevarlo aparte por USB u otro medio, nunca por chat/git)
    Debe contener:
    SUPABASE_URL=
    SUPABASE_KEY=
    SUPABASE_SERVICE_ROLE_KEY=
 
-3) Instalar Python 3.14 (misma version usada en .venv/pyvenv.cfg) si no esta instalado
+3) Abrir la carpeta en VS Code y confiar en ella
+   Si aparece "Restricted Mode" arriba, click en el aviso (o el icono de escudo abajo
+   a la izquierda) -> Manage -> Trust Folder. Sin esto la extension de Python no deja
+   seleccionar interprete.
 
 4) Crear entorno virtual e instalar dependencias
    python -m venv .venv
    .\.venv\Scripts\Activate.ps1
    pip install -r requirements.txt
+
+5) Seleccionar el interprete en VS Code
+   Ctrl+Shift+P (Paleta de Comandos, el cuadro debe empezar con ">", no confundir con
+   Ctrl+P que es buscador de archivos) -> escribir "Python: Select Interpreter" ->
+   elegir el que aparece con la ruta .venv de esta carpeta.
 
 === CORRER EL PROYECTO (cada vez) ===
 
@@ -23,3 +54,4 @@
 uvicorn main:app --reload --port 8000
 
 Luego abrir: http://127.0.0.1:8000/login
+Login de prueba: superadmin@cinepolis.com (clave: pedirla aparte, no va en este archivo)
